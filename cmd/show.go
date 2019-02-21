@@ -52,17 +52,21 @@ func showPassword(cmd *cobra.Command, args []string) {
 	for _, a := range args {
 		root += "/" + a
 	}
-	root += ".gpg"
-	// TODO: don't use external program
-	lines := util.RunCommand("gpg", "-dq", root)
-	if Copy {
-		if err := clipboard.WriteAll(lines[0]); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+	if f, e := os.Stat(root); !os.IsNotExist(e) && f.IsDir() {
+		listPasswords(cmd, args)
 	} else {
-		for _, l := range lines {
-			fmt.Println(l)
+		root += ".gpg"
+		// TODO: don't use external program
+		lines := util.RunCommand("gpg", "-dq", root)
+		if Copy {
+			if err := clipboard.WriteAll(lines[0]); err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		} else {
+			for _, l := range lines {
+				fmt.Println(l)
+			}
 		}
 	}
 }

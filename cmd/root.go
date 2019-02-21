@@ -33,7 +33,7 @@ var rootCmd = &cobra.Command{
 	Short: "go-pass is a pass clone written in Go",
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		listPasswords(cmd, args)
+		showPassword(cmd, args)
 	},
 }
 
