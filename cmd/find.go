@@ -39,7 +39,7 @@ func init() {
 }
 
 func findPasswords(cmd *cobra.Command, args []string) {
-	root := util.GetHomeDir() + "/.password-store"
+	root := util.GetPasswordStore()
 	pattern := ""
 	if len(args) > 0 {
 		for _, a := range args {

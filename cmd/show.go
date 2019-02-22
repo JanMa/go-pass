@@ -51,7 +51,7 @@ func init() {
 }
 
 func showPassword(cmd *cobra.Command, args []string) {
-	root := util.GetHomeDir() + "/.password-store"
+	root := util.GetPasswordStore()
 	for _, a := range args {
 		root += "/" + a
 	}

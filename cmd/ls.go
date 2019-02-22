@@ -42,7 +42,7 @@ func init() {
 }
 
 func listPasswords(cmd *cobra.Command, args []string) {
-	root := util.GetHomeDir() + "/.password-store"
+	root := util.GetPasswordStore()
 	path := "Password Store"
 	if len(args) > 0 {
 		path = args[0]

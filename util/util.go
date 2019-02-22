@@ -11,7 +11,7 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 )
 
-// Prints a line of output
+// PrintLine prints a line of output
 func PrintLine(s string) {
 	if i := strings.LastIndex(s, ".gpg"); i != -1 {
 		fmt.Println(s[:i])
@@ -20,6 +20,7 @@ func PrintLine(s string) {
 	}
 }
 
+// RundCommand runs a given command and returns the output
 func RunCommand(name string, args ...string) []string {
 	cmd, err := exec.Command(name, args...).Output()
 	if err != nil {
@@ -34,11 +35,20 @@ func RunCommand(name string, args ...string) []string {
 	return lines
 }
 
-func GetHomeDir() string {
+func getHomeDir() string {
 	home, err := homedir.Dir()
 	if err != nil {
 		fmt.Println(err)
 		defer os.Exit(1)
 	}
 	return home
+}
+
+// GetPasswordStore returns the path to the password store
+func GetPasswordStore() string {
+	env := os.Getenv("PASSWORD_STORE_DIR")
+	if len(env) == 0 {
+		env = getHomeDir() + "/.password-store"
+	}
+	return env
 }
