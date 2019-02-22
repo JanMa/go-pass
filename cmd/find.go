@@ -22,37 +22,33 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/util"
 )
 
-// lsCmd represents the ls command
-var (
-	lsCmd = &cobra.Command{
-		Use:     "ls",
-		Aliases: []string{"list"},
-		Short:   "List passwords.",
-		Args:    cobra.MinimumNArgs(0),
-		Run:     listPasswords,
-	}
-)
-
-func init() {
-	rootCmd.AddCommand(lsCmd)
+// findCmd represents the find command
+var findCmd = &cobra.Command{
+	Use:   "find",
+	Short: "List passwords that match pass-names",
+	Run:   findPasswords,
 }
 
-func listPasswords(cmd *cobra.Command, args []string) {
+func init() {
+	rootCmd.AddCommand(findCmd)
+}
+
+func findPasswords(cmd *cobra.Command, args []string) {
 	root := util.GetHomeDir() + "/.password-store"
-	path := "Password Store"
+	pattern := ""
 	if len(args) > 0 {
-		path = args[0]
 		for _, a := range args {
-			root += "/" + a
+			pattern += a
 		}
 	}
 	// TODO: don't use external program
-	lines := util.RunCommand("tree", root, "-P", "*.gpg", "--noreport")
-	fmt.Println(path)
+	lines := util.RunCommand("tree", "-C", "-l", "--noreport", "-P", pattern+"*", "--prune", "--matchdirs", "--ignore-case", root)
+	fmt.Println("Search Terms:", pattern)
 	for i := 1; i < len(lines); i++ {
 		util.PrintLine(lines[i])
 	}

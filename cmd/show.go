@@ -25,6 +25,7 @@ import (
 	"os"
 
 	"github.com/atotto/clipboard"
+	qrcode "github.com/skip2/go-qrcode"
 	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/util"
 )
@@ -38,13 +39,15 @@ var (
 		Run:   showPassword,
 	}
 
-	Copy bool
+	Copy   bool
+	QRCode bool
 )
 
 func init() {
 	rootCmd.AddCommand(showCmd)
 
-	showCmd.Flags().BoolVarP(&Copy, "copy", "c", false, "Copy output to clipboard")
+	showCmd.Flags().BoolVarP(&Copy, "copy", "c", false, "Copy password to clipboard")
+	showCmd.Flags().BoolVarP(&QRCode, "qrcode", "q", false, "Display output as QR code")
 }
 
 func showPassword(cmd *cobra.Command, args []string) {
@@ -62,6 +65,17 @@ func showPassword(cmd *cobra.Command, args []string) {
 			if err := clipboard.WriteAll(lines[0]); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
+			}
+		} else if QRCode {
+			content := ""
+			for _, l := range lines {
+				content += l + "\n"
+			}
+			qr, err := qrcode.New(content, qrcode.Low)
+			if err != nil {
+				fmt.Println(err)
+			} else {
+				fmt.Print(qr.ToSmallString(false))
 			}
 		} else {
 			for _, l := range lines {
