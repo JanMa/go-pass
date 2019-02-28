@@ -46,8 +46,8 @@ var (
 func init() {
 	rootCmd.AddCommand(showCmd)
 
-	showCmd.Flags().IntVarP(&Copy, "copy", "c", 0, "Copy password to clipboard")
-	showCmd.Flags().Lookup("copy").NoOptDefVal = "1"
+	showCmd.Flags().IntVarP(&Copy, "clip", "c", 0, "Copy password to clipboard")
+	showCmd.Flags().Lookup("clip").NoOptDefVal = "1"
 	showCmd.Flags().IntVarP(&QRCode, "qrcode", "q", 0, "Display output as QR code")
 	showCmd.Flags().Lookup("qrcode").NoOptDefVal = "1"
 }
