@@ -35,19 +35,21 @@ var (
 	showCmd = &cobra.Command{
 		Use:   "show",
 		Short: "Show existing password and optionally put it on the clipboard.",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.MaximumNArgs(1),
 		Run:   showPassword,
 	}
 
-	Copy   bool
-	QRCode bool
+	Copy   int
+	QRCode int
 )
 
 func init() {
 	rootCmd.AddCommand(showCmd)
 
-	showCmd.Flags().BoolVarP(&Copy, "copy", "c", false, "Copy password to clipboard")
-	showCmd.Flags().BoolVarP(&QRCode, "qrcode", "q", false, "Display output as QR code")
+	showCmd.Flags().IntVarP(&Copy, "copy", "c", 0, "Copy password to clipboard")
+	showCmd.Flags().Lookup("copy").NoOptDefVal = "1"
+	showCmd.Flags().IntVarP(&QRCode, "qrcode", "q", 0, "Display output as QR code")
+	showCmd.Flags().Lookup("qrcode").NoOptDefVal = "1"
 }
 
 func showPassword(cmd *cobra.Command, args []string) {
@@ -59,19 +61,27 @@ func showPassword(cmd *cobra.Command, args []string) {
 		listPasswords(cmd, args)
 	} else {
 		root += ".gpg"
+		if _, e := os.Stat(root); os.IsNotExist(e) {
+			fmt.Printf("Error: %s is not in the password store.\n", args[0])
+			os.Exit(1)
+		}
 		// TODO: don't use external program
 		lines := util.RunCommand("gpg", "-dq", root)
-		if Copy {
-			if err := clipboard.WriteAll(lines[0]); err != nil {
+		if Copy > 0 {
+			if Copy > len(lines) {
+				fmt.Printf("There is no password to put on the clipboard at line %d.\n", Copy)
+				os.Exit(1)
+			}
+			if err := clipboard.WriteAll(lines[Copy-1]); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-		} else if QRCode {
-			content := ""
-			for _, l := range lines {
-				content += l + "\n"
+		} else if QRCode > 0 {
+			if QRCode > len(lines) {
+				fmt.Printf("There is no password to put on the clipboard at line %d.\n", QRCode)
+				os.Exit(1)
 			}
-			qr, err := qrcode.New(content, qrcode.Low)
+			qr, err := qrcode.New(lines[QRCode-1], qrcode.Low)
 			if err != nil {
 				fmt.Println(err)
 			} else {
