@@ -52,3 +52,16 @@ func GetPasswordStore() string {
 	}
 	return env
 }
+
+// YesNo simple Yes or No dialogue
+func YesNo() bool {
+	fmt.Printf(" [y/N] ")
+	reader := bufio.NewReader(os.Stdin)
+	i, _ := reader.ReadString('\n')
+	i = strings.Trim(i, "\n")
+	i = strings.ToLower(i)
+	if i == "y" || i == "yes" {
+		return true
+	}
+	return false
+}
