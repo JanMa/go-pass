@@ -69,9 +69,13 @@ func insertPassword(cmd *cobra.Command, args []string) {
 			os.Exit(1)
 		}
 	}
-
-	password := enterPassword(args[0])
-	encryptPassword(password, root)
+	if MultiLine {
+		fmt.Printf("Enter contents of %s and press Ctrl+D when finished:\n\n", args[0])
+		encryptMultiLine(root)
+	} else {
+		password := enterPassword(args[0])
+		encryptPassword(password, root)
+	}
 }
 
 func getRecepientOpts() string {
@@ -127,4 +131,17 @@ func encryptPassword(pass, file string) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func encryptMultiLine(file string) {
+	scanner := bufio.NewScanner(os.Stdin)
+	pass := []string{}
+	for scanner.Scan() {
+		pass = append(pass, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	encryptPassword(strings.Join(pass, "\n"), file)
 }
