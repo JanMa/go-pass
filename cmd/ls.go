@@ -32,7 +32,7 @@ var (
 		Use:     "ls",
 		Aliases: []string{"list"},
 		Short:   "List passwords.",
-		Args:    cobra.MinimumNArgs(0),
+		Args:    cobra.MaximumNArgs(1),
 		Run:     listPasswords,
 	}
 )
@@ -46,12 +46,10 @@ func listPasswords(cmd *cobra.Command, args []string) {
 	path := "Password Store"
 	if len(args) > 0 {
 		path = args[0]
-		for _, a := range args {
-			root += "/" + a
-		}
+		root += "/" + path
 	}
 	// TODO: don't use external program
-	lines := util.RunCommand("tree", root, "-P", "*.gpg", "--noreport")
+	lines := util.RunCommand("tree", "-C", "-l", root, "-P", "*.gpg", "--noreport")
 	fmt.Println(path)
 	for i := 1; i < len(lines); i++ {
 		util.PrintLine(lines[i])
