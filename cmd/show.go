@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/atotto/clipboard"
 	qrcode "github.com/skip2/go-qrcode"
@@ -54,8 +55,8 @@ func init() {
 
 func showPassword(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore()
-	for _, a := range args {
-		root += "/" + a
+	if len(args) > 0 {
+		root += "/" + args[0]
 	}
 	if f, e := os.Stat(root); !os.IsNotExist(e) && f.IsDir() {
 		listPasswords(cmd, args)
@@ -88,9 +89,7 @@ func showPassword(cmd *cobra.Command, args []string) {
 				fmt.Print(qr.ToSmallString(false))
 			}
 		} else {
-			for _, l := range lines {
-				fmt.Println(l)
-			}
+			fmt.Println(strings.Join(lines, "\n"))
 		}
 	}
 }

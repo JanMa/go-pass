@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"gitlab.com/JanMa/go-pass/util"
 	"golang.org/x/crypto/ssh/terminal"
-	// "io"
 	"os"
 	"os/exec"
 	"strings"
