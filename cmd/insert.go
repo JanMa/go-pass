@@ -59,13 +59,20 @@ func init() {
 func insertPassword(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore() + "/" + args[0] + ".gpg"
 	if f, e := os.Stat(root); !os.IsNotExist(e) && !f.IsDir() {
-		fmt.Printf("An entry already exists for %s. Overwrite it?", args[0])
-		if util.YesNo() {
+		overwrite := func() {
 			if err := os.Remove(root); err != nil {
 				fmt.Println(err)
 			}
+		}
+		if Force {
+			overwrite()
 		} else {
-			os.Exit(1)
+			fmt.Printf("An entry already exists for %s. Overwrite it?", args[0])
+			if util.YesNo() {
+				overwrite()
+			} else {
+				os.Exit(1)
+			}
 		}
 	}
 	if MultiLine {
