@@ -27,6 +27,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -133,6 +134,7 @@ func enterPassword(name string) string {
 func encryptPassword(pass, file string) {
 	cmd := "echo \"" + pass + "\" | gpg -e " + getRecepientOpts() + " -o " + file + " --quiet --yes --compress-algo=none --no-encrypt-to"
 	gpg := exec.Command("bash", "-c", cmd)
+	os.MkdirAll(filepath.Dir(file), 0700)
 	if err := gpg.Run(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
