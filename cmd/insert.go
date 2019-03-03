@@ -101,14 +101,13 @@ func getRecepientOpts() string {
 }
 
 func readPassword() (string, error) {
-	if Echo {
-		r := bufio.NewReader(os.Stdin)
-		p, e := r.ReadString('\n')
-		return strings.Trim(p, "\n"), e
-	}
 	t := terminal.NewTerminal(os.Stdin, "")
 	oldState, _ := terminal.MakeRaw(0)
 	defer terminal.Restore(0, oldState)
+	if Echo {
+		p, e := t.ReadLine()
+		return p, e
+	}
 	p, e := t.ReadPassword("")
 	return p, e
 }
@@ -132,7 +131,7 @@ func enterPassword(name string) string {
 }
 
 func encryptPassword(pass, file string) {
-	cmd := "echo \"" + pass + "\" | gpg -e " + getRecepientOpts() + " -o " + file + " --quiet --yes --compress-algo=none --no-encrypt-to"
+	cmd := "echo \"" + pass + "\" | gpg -e " + getRecepientOpts() + " -o " + strings.ReplaceAll(file, " ", `\ `) + " --quiet --yes --compress-algo=none --no-encrypt-to"
 	gpg := exec.Command("bash", "-c", cmd)
 	os.MkdirAll(filepath.Dir(file), 0700)
 	if err := gpg.Run(); err != nil {

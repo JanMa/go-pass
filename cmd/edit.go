@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/util"
@@ -52,7 +53,7 @@ func editPassword(cmd *cobra.Command, args []string) {
 			os.Exit(1)
 		}
 	}
-	cmdArgs := "cat \"" + tmpfile + "\" | gpg -e " + getRecepientOpts() + " -o " + root + " --quiet --yes --compress-algo=none --no-encrypt-to"
+	cmdArgs := "cat \"" + tmpfile + "\" | gpg -e " + getRecepientOpts() + " -o " + strings.ReplaceAll(root, " ", `\ `) + " --quiet --yes --compress-algo=none --no-encrypt-to"
 	gpg := exec.Command("bash", "-c", cmdArgs)
 	edit := os.Getenv("EDITOR")
 	if len(edit) == 0 {
