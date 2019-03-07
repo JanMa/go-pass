@@ -21,7 +21,7 @@ func PrintLine(s string) {
 	}
 }
 
-// RundCommand runs a given command and returns the output
+// RunCommand runs a given command and returns the output
 func RunCommand(name string, args ...string) []string {
 	cmd, err := exec.Command(name, args...).Output()
 	if err != nil {
