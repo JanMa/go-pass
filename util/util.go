@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"math/rand"
 	"os"
 	"os/exec"
 	"strings"
@@ -70,4 +71,21 @@ func YesNo() bool {
 		return true
 	}
 	return false
+}
+
+// RandomString returns a random string of [a-zA-Z0-1] of the given length
+func RandomString(n int) string {
+	var letter = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letter[rand.Intn(len(letter))]
+	}
+	return string(b)
+}
+
+// TmpFile generates the path to a new temporary file
+func TmpFile() string {
+	os.Mkdir(os.TempDir()+"/go-pass", 0700)
+	return os.TempDir() + "/go-pass/" + RandomString(8)
 }

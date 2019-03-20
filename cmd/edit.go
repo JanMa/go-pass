@@ -25,7 +25,7 @@ func init() {
 
 func editPassword(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore() + "/" + args[0] + ".gpg"
-	tmpfile := os.TempDir() + "/go-pass-tmp"
+	tmpfile := util.TmpFile()
 	if f, e := os.Stat(root); !os.IsNotExist(e) && !f.IsDir() {
 		decrypt := exec.Command("gpg", "--quiet", "-o", tmpfile, "-d", root)
 		if err := decrypt.Run(); err != nil {
@@ -33,8 +33,13 @@ func editPassword(cmd *cobra.Command, args []string) {
 			os.Exit(1)
 		}
 	}
-	cmdArgs := "cat \"" + tmpfile + "\" | gpg -e " + getRecepientOpts() + " -o " + strings.ReplaceAll(root, " ", `\ `) + " --quiet --yes --compress-algo=none --no-encrypt-to"
-	gpg := exec.Command("bash", "-c", cmdArgs)
+	gpg := exec.Command("gpg2",
+		"-e", "-o", strings.ReplaceAll(root, " ", `\ `),
+		"--quiet", "--yes", "--compress-algo=none", "--no-encrypt-to")
+	for _, r := range getRecepientOptsArray() {
+		gpg.Args = append(gpg.Args, r)
+	}
+	gpg.Args = append(gpg.Args, tmpfile)
 	edit := os.Getenv("EDITOR")
 	if len(edit) == 0 {
 		edit = "nano"

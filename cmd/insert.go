@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gitlab.com/JanMa/go-pass/util"
 	"golang.org/x/crypto/ssh/terminal"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -65,8 +66,8 @@ func insertPassword(cmd *cobra.Command, args []string) {
 	}
 }
 
-func getRecepientOpts() string {
-	opts := ""
+func getRecepientOptsArray() []string {
+	opts := []string{}
 	idFile := util.GetPasswordStore() + "/.gpg-id"
 	i, e := os.Open(idFile)
 	if e != nil {
@@ -75,7 +76,8 @@ func getRecepientOpts() string {
 	}
 	s := bufio.NewScanner(i)
 	for s.Scan() {
-		opts += " -r " + s.Text()
+		opts = append(opts, "-r")
+		opts = append(opts, s.Text())
 	}
 	return opts
 }
@@ -111,8 +113,21 @@ func enterPassword(name string) string {
 }
 
 func encryptPassword(pass, file string) {
-	cmd := "echo \"" + pass + "\" | gpg -e " + getRecepientOpts() + " -o " + strings.ReplaceAll(file, " ", `\ `) + " --quiet --yes --compress-algo=none --no-encrypt-to"
-	gpg := exec.Command("bash", "-c", cmd)
+	gpg := exec.Command("gpg2",
+		"-e", "-o", strings.ReplaceAll(file, " ", `\ `),
+		"--quiet", "--yes", "--compress-algo=none", "--no-encrypt-to")
+	for _, r := range getRecepientOptsArray() {
+		gpg.Args = append(gpg.Args, r)
+	}
+	stdin, err := gpg.StdinPipe()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	go func() {
+		defer stdin.Close()
+		io.WriteString(stdin, pass)
+	}()
 	os.MkdirAll(filepath.Dir(file), 0700)
 	if err := gpg.Run(); err != nil {
 		fmt.Println(err)
