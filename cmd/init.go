@@ -33,8 +33,7 @@ func init() {
 }
 
 func initPasswordStore(cmd *cobra.Command, args []string) {
-	root := util.GetPasswordStore()
-	re := regexp.MustCompile(`sub:.:[0-9]+:.:([A-Z0-9]+)`)
+	re := regexp.MustCompile(`sub:[^:]*:[^:]*:[^:]*:([^:]*):[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[a-zA-Z]*e[a-zA-Z]*:.*`)
 	gpg := exec.Command("gpg", "--list-keys", "--with-colons")
 	for _, a := range args {
 		gpg.Args = append(gpg.Args, a)
@@ -52,6 +51,7 @@ func initPasswordStore(cmd *cobra.Command, args []string) {
 	}
 	fmt.Println(gpgKeys)
 
+	root := util.GetPasswordStore()
 	if len(Subdir) > 0 {
 		root += "/" + Subdir
 	}
