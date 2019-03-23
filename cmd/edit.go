@@ -14,7 +14,7 @@ import (
 // editCmd represents the edit command
 var editCmd = &cobra.Command{
 	Use:   "edit",
-	Short: "Insert a new password or edit an existing password using /usr/bin/nano.",
+	Short: "Insert a new password or edit an existing password using " + getEditor() + ".",
 	Args:  cobra.ExactArgs(1),
 	Run:   editPassword,
 }
@@ -40,11 +40,7 @@ func editPassword(cmd *cobra.Command, args []string) {
 		gpg.Args = append(gpg.Args, r)
 	}
 	gpg.Args = append(gpg.Args, tmpfile)
-	edit := os.Getenv("EDITOR")
-	if len(edit) == 0 {
-		edit = "nano"
-	}
-	editor := exec.Command(edit, tmpfile)
+	editor := exec.Command(getEditor(), tmpfile)
 	editor.Stdin = os.Stdin
 	editor.Stdout = os.Stdout
 	editor.Stderr = os.Stderr
@@ -66,4 +62,12 @@ func editPassword(cmd *cobra.Command, args []string) {
 		fmt.Println(err)
 	}
 
+}
+
+func getEditor() string {
+	editor := os.Getenv("EDITOR")
+	if len(editor) == 0 {
+		editor = "vi"
+	}
+	return editor
 }
