@@ -33,24 +33,7 @@ func init() {
 }
 
 func initPasswordStore(cmd *cobra.Command, args []string) {
-	re := regexp.MustCompile(`sub:[^:]*:[^:]*:[^:]*:([^:]*):[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[a-zA-Z]*e[a-zA-Z]*:.*`)
-	gpg := exec.Command("gpg", "--list-keys", "--with-colons")
-	for _, a := range args {
-		gpg.Args = append(gpg.Args, a)
-	}
-	k, e := gpg.Output()
-	if e != nil {
-		fmt.Println(e)
-		os.Exit(1)
-	}
-	match := re.FindAllSubmatch(k, -1)
-
-	gpgKeys := []string{}
-	for _, m := range match {
-		gpgKeys = append(gpgKeys, string(m[1]))
-	}
-	fmt.Println(gpgKeys)
-
+	gpgKeys := getKeys(args)
 	root := util.GetPasswordStore()
 	if len(Subdir) > 0 {
 		root += "/" + Subdir
@@ -78,41 +61,66 @@ func initPasswordStore(cmd *cobra.Command, args []string) {
 			return filepath.SkipDir
 		}
 		if filepath.Ext(path) == ".gpg" {
-			currentKeys, _ := exec.Command("gpg", "-v", "-d", "--list-only", "--keyid-format", "long", path).CombinedOutput()
-			if !matchKeys(string(currentKeys), gpgKeys) {
-				fmt.Printf("%s: reencrypting to %s\n", filepath.Base(path), strings.Join(gpgKeys, ", "))
-				pass := util.RunCommand("gpg", "-dq", path)
-				if e := os.Remove(path); e != nil {
-					fmt.Println(e)
-				}
-				gpg := exec.Command("gpg2",
-					"-e", "-o", path,
-					"--quiet", "--yes", "--compress-algo=none", "--no-encrypt-to")
-				for _, r := range gpgKeys {
-					gpg.Args = append(gpg.Args, "-r")
-					gpg.Args = append(gpg.Args, r)
-				}
-				stdin, err := gpg.StdinPipe()
-				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
-				}
-				go func() {
-					defer stdin.Close()
-					io.WriteString(stdin, strings.Join(pass, "\n"))
-				}()
-				os.MkdirAll(filepath.Dir(path), 0700)
-				if err := gpg.Run(); err != nil {
-					fmt.Println(err)
-					os.Exit(1)
-				}
-			}
+			reEncryptFile(path, gpgKeys)
 		}
 		return nil
 	})
 	if err != nil {
 		fmt.Println(err)
 		return
+	}
+}
+
+func getKeys(recipients []string) []string {
+	re := regexp.MustCompile(`sub:[^:]*:[^:]*:[^:]*:([^:]*):[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[a-zA-Z]*e[a-zA-Z]*:.*`)
+	gpg := exec.Command("gpg", "--list-keys", "--with-colons")
+	for _, r := range recipients {
+		gpg.Args = append(gpg.Args, r)
+	}
+	k, e := gpg.Output()
+	if e != nil {
+		fmt.Println(e)
+		os.Exit(1)
+	}
+	match := re.FindAllSubmatch(k, -1)
+
+	gpgKeys := []string{}
+	for _, m := range match {
+		gpgKeys = append(gpgKeys, string(m[1]))
+	}
+
+	return gpgKeys
+}
+
+func reEncryptFile(path string, keys []string) {
+	currentKeys, _ := exec.Command("gpg", "-v", "-d", "--list-only", "--keyid-format", "long", path).CombinedOutput()
+	if !matchKeys(string(currentKeys), keys) {
+		fmt.Printf("%s: reencrypting to %s\n", filepath.Base(path), strings.Join(keys, ", "))
+		pass := util.RunCommand("gpg", "-dq", path)
+		if e := os.Remove(path); e != nil {
+			fmt.Println(e)
+		}
+		gpg := exec.Command("gpg2",
+			"-e", "-o", path,
+			"--quiet", "--yes", "--compress-algo=none", "--no-encrypt-to")
+		for _, r := range keys {
+			gpg.Args = append(gpg.Args, "-r")
+			gpg.Args = append(gpg.Args, r)
+		}
+		stdin, err := gpg.StdinPipe()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		go func() {
+			defer stdin.Close()
+			io.WriteString(stdin, strings.Join(pass, "\n"))
+		}()
+		os.MkdirAll(filepath.Dir(path), 0700)
+		if err := gpg.Run(); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	}
 }
 
