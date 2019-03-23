@@ -1,8 +1,6 @@
 package util
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"math/rand"
 	"os"
@@ -24,17 +22,12 @@ func PrintLine(s string) {
 
 // RunCommand runs a given command and returns the output
 func RunCommand(name string, args ...string) []string {
-	cmd, err := exec.Command(name, args...).Output()
+	cmd, err := exec.Command(name, args...).CombinedOutput()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(string(cmd))
 		defer os.Exit(1)
 	}
-	scanner := bufio.NewScanner(bytes.NewReader(cmd))
-	var lines []string
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines
+	return strings.Split(string(cmd), "\n")
 }
 
 func getHomeDir() string {

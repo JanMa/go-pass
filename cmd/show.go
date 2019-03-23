@@ -69,7 +69,7 @@ func showPassword(cmd *cobra.Command, args []string) {
 				fmt.Print(qr.ToSmallString(false))
 			}
 		} else {
-			fmt.Println(strings.Join(lines, "\n"))
+			fmt.Print(strings.Join(lines, "\n"))
 		}
 	}
 }
