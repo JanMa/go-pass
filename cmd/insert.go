@@ -25,9 +25,9 @@ during entry. Or, optionally, the entry may be multiline. Prompt before
 overwriting existing password unless forced.`,
 		Run: insertPassword,
 	}
-	Echo      bool
-	MultiLine bool
-	Force     bool
+	Echo        bool
+	MultiLine   bool
+	ForceInsert bool
 )
 
 func init() {
@@ -35,7 +35,7 @@ func init() {
 
 	insertCmd.Flags().BoolVarP(&Echo, "echo", "e", false, "Echo password back to console")
 	insertCmd.Flags().BoolVarP(&MultiLine, "multiline", "m", false, "Multiline input")
-	insertCmd.Flags().BoolVarP(&Force, "force", "f", false, "Overwrite existing password without prompt")
+	insertCmd.Flags().BoolVarP(&ForceInsert, "force", "f", false, "Overwrite existing password without prompt")
 }
 
 func insertPassword(cmd *cobra.Command, args []string) {
@@ -46,7 +46,7 @@ func insertPassword(cmd *cobra.Command, args []string) {
 				fmt.Println(err)
 			}
 		}
-		if Force {
+		if ForceInsert {
 			overwrite()
 		} else {
 			fmt.Printf("An entry already exists for %s. Overwrite it?", args[0])
@@ -113,7 +113,7 @@ func enterPassword(name string) string {
 }
 
 func encryptPassword(pass, file string) {
-	gpg := exec.Command("gpg2",
+	gpg := exec.Command("gpg",
 		"-e", "-o", strings.ReplaceAll(file, " ", `\ `),
 		"--quiet", "--yes", "--compress-algo=none", "--no-encrypt-to")
 	for _, r := range getRecepientOptsArray() {

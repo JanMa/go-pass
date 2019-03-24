@@ -65,9 +65,9 @@ func showPassword(cmd *cobra.Command, args []string) {
 			qr, err := qrcode.New(lines[QRCode-1], qrcode.Low)
 			if err != nil {
 				fmt.Println(err)
-			} else {
-				fmt.Print(qr.ToSmallString(false))
+				os.Exit(1)
 			}
+			fmt.Print(qr.ToSmallString(false))
 		} else {
 			fmt.Print(strings.Join(lines, "\n"))
 		}
