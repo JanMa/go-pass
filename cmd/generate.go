@@ -82,16 +82,11 @@ func generatePassword(cmd *cobra.Command, args []string) {
 				fmt.Println(err)
 			}
 		}
-		if ForceGen && !InPlace {
+		if ForceGen && !InPlace || !ForceGen && !InPlace &&
+			util.YesNo(fmt.Sprintf("An entry already exists for %s. Overwrite it?", args[0])) {
 			overwrite()
-			fmt.Println("overwrite")
-		} else if !ForceGen && !InPlace {
-			fmt.Printf("An entry already exists for %s. Overwrite it?", args[0])
-			if util.YesNo() {
-				overwrite()
-			} else {
-				os.Exit(1)
-			}
+		} else if !InPlace {
+			os.Exit(1)
 		}
 	}
 	pass := randomString(length, !NoSymbols)

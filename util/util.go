@@ -49,11 +49,11 @@ func GetPasswordStore() string {
 }
 
 // YesNo simple Yes or No dialogue
-func YesNo() bool {
+func YesNo(msg string) bool {
 	t := terminal.NewTerminal(os.Stdin, "")
 	oldState, _ := terminal.MakeRaw(0)
 	defer terminal.Restore(0, oldState)
-	fmt.Printf(" [y/N] ")
+	fmt.Printf("%s [y/N] ", msg)
 	i, e := t.ReadLine()
 	if e != nil {
 		fmt.Println(e)
