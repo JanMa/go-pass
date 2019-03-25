@@ -79,6 +79,6 @@ func RandomString(n int) string {
 
 // TmpFile generates the path to a new temporary file
 func TmpFile() string {
-	os.Mkdir(os.TempDir()+"/go-pass", 0700)
+	os.Mkdir(os.TempDir()+"/go-pass", 0755)
 	return os.TempDir() + "/go-pass/" + RandomString(8)
 }

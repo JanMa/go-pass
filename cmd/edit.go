@@ -53,7 +53,7 @@ func editPassword(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	os.MkdirAll(filepath.Dir(root), 0700)
+	os.MkdirAll(filepath.Dir(root), 0755)
 	if err := gpg.Run(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

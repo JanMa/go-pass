@@ -116,7 +116,7 @@ func reEncryptFile(path string, keys []string) {
 			defer stdin.Close()
 			io.WriteString(stdin, strings.Join(pass, "\n"))
 		}()
-		os.MkdirAll(filepath.Dir(path), 0700)
+		os.MkdirAll(filepath.Dir(path), 0755)
 		if err := gpg.Run(); err != nil {
 			fmt.Println(err)
 			os.Exit(1)

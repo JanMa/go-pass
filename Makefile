@@ -4,6 +4,7 @@ build:
 get:
 		GO111MODULE=on go get -v
 
+.PHONY: vendor
 vendor:
 		GO111MODULE=on go mod vendor
 
