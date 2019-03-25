@@ -2,6 +2,7 @@
 package copy
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -41,7 +42,7 @@ func copy(src, dest string, info os.FileInfo) error {
 // with considering existence of parent directory
 // and file permission.
 func fcopy(src, dest string, info os.FileInfo) error {
-
+	fmt.Printf("'%s' -> '%s'\n", src, dest)
 	if err := os.MkdirAll(filepath.Dir(dest), os.ModePerm); err != nil {
 		return err
 	}
@@ -99,6 +100,7 @@ func dcopy(srcdir, destdir string, info os.FileInfo) error {
 // lcopy is for a symlink,
 // with just creating a new symlink by replicating src symlink.
 func lcopy(src, dest string, info os.FileInfo) error {
+	fmt.Printf("'%s' -> '%s'\n", src, dest)
 	src, err := os.Readlink(src)
 	if err != nil {
 		return err
