@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -41,7 +42,10 @@ func copyPassword(cmd *cobra.Command, args []string) {
 		}
 		fmt.Println(fromPath)
 		copy.Copy(fromPath, toPath)
-		fmt.Println(findGpgID(toPath))
+		gpgID := findGpgID(toPath)
+		recv, _ := getRecipientsFromGpgID(gpgID)
+		// walk dst directory
+		reEncryptDir(toPath, recv)
 		// src exists and is not a directory
 	} else if f, e := os.Stat(fromPath + ".gpg"); !os.IsNotExist(e) && !f.IsDir() {
 		// dst has a slash as suffix indicating it is a directory
@@ -55,8 +59,9 @@ func copyPassword(cmd *cobra.Command, args []string) {
 		}
 		fmt.Println(fromPath + ".gpg")
 		copy.Copy(fromPath+".gpg", toPath+".gpg")
-		fmt.Println(findGpgID(toPath + ".gpg"))
-
+		gpgID := findGpgID(toPath + ".gpg")
+		recv, _ := getRecipientsFromGpgID(gpgID)
+		reEncryptFile(toPath+".gpg", recv)
 	} else {
 		fmt.Printf("Error: %s is not in the password store.\n", args[0])
 		os.Exit(1)
@@ -76,4 +81,15 @@ func findGpgID(path string) string {
 		}
 	}
 	return util.GetPasswordStore() + "/.gpg-id"
+}
+
+func getRecipientsFromGpgID(path string) ([]string, error) {
+	if _, e := os.Stat(path); os.IsNotExist(e) {
+		return nil, e
+	}
+	gpgID, e := ioutil.ReadFile(path)
+	if e != nil {
+		return nil, e
+	}
+	return strings.Split(strings.Trim(string(gpgID), "\n"), "\n"), nil
 }

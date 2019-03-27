@@ -36,7 +36,7 @@ func initPasswordStore(cmd *cobra.Command, args []string) {
 	gpgKeys := getKeys(args)
 	root := util.GetPasswordStore()
 	if len(Subdir) > 0 {
-		root += "/" + Subdir
+		root += "/" + strings.TrimRight(Subdir, "/")
 	}
 	gpgID := root + "/.gpg-id"
 	if _, e := os.Stat(gpgID); os.IsExist(e) {
@@ -53,22 +53,7 @@ func initPasswordStore(cmd *cobra.Command, args []string) {
 	}
 	f.Write([]byte(strings.Join(args, "\n") + "\n"))
 	fmt.Printf("Password store initialized for %s\n", strings.Trim(strings.Join(args, ", "), "\n"))
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if info.IsDir() && info.Name() == ".git" {
-			return filepath.SkipDir
-		}
-		if filepath.Ext(path) == ".gpg" {
-			reEncryptFile(path, gpgKeys)
-		}
-		return nil
-	})
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	reEncryptDir(root, gpgKeys)
 }
 
 func getKeys(recipients []string) []string {
@@ -117,10 +102,29 @@ func reEncryptFile(path string, keys []string) {
 			io.WriteString(stdin, strings.Join(pass, "\n"))
 		}()
 		os.MkdirAll(filepath.Dir(path), 0755)
-		if err := gpg.Run(); err != nil {
-			fmt.Println(err)
+		if o, err := gpg.CombinedOutput(); err != nil {
+			fmt.Println(string(o))
 			os.Exit(1)
 		}
+	}
+}
+
+func reEncryptDir(path string, keys []string) {
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() && info.Name() == ".git" {
+			return filepath.SkipDir
+		}
+		if filepath.Ext(path) == ".gpg" {
+			reEncryptFile(path, keys)
+		}
+		return nil
+	})
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 }
 
