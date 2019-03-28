@@ -9,12 +9,13 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "go-pass",
+	Use:   "go-pass [subfolder | command]",
 	Short: "go-pass is a pass clone written in Go",
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		showPassword(cmd, args)
 	},
+	Example: "",
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
