@@ -16,12 +16,13 @@ import (
 // initCmd represents the init command
 var (
 	initCmd = &cobra.Command{
-		Use:   "init",
+		Use:   "init [--path=subfolder,-p subfolder] gpg-id...",
 		Args:  cobra.MinimumNArgs(1),
 		Short: "Initialize new password storage and use gpg-id for encryption.",
 		Long: `Initialize new password storage and use gpg-id for encryption.
 Selectively reencrypt existing passwords using new gpg-id.`,
-		Run: initPasswordStore,
+		Run:                   initPasswordStore,
+		DisableFlagsInUseLine: true,
 	}
 
 	Subdir string

@@ -9,11 +9,12 @@ import (
 // lsCmd represents the ls command
 var (
 	lsCmd = &cobra.Command{
-		Use:     "ls",
-		Aliases: []string{"list"},
-		Short:   "List passwords.",
-		Args:    cobra.MaximumNArgs(1),
-		Run:     listPasswords,
+		Use:                   "ls [pass-name]",
+		Aliases:               []string{"list"},
+		Short:                 "List passwords.",
+		Args:                  cobra.MaximumNArgs(1),
+		Run:                   listPasswords,
+		DisableFlagsInUseLine: true,
 	}
 )
 

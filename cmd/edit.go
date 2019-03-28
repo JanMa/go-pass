@@ -13,10 +13,11 @@ import (
 
 // editCmd represents the edit command
 var editCmd = &cobra.Command{
-	Use:   "edit",
-	Short: "Insert a new password or edit an existing password using " + getEditor() + ".",
-	Args:  cobra.ExactArgs(1),
-	Run:   editPassword,
+	Use:                   "edit pass-name",
+	Short:                 "Insert a new password or edit an existing password using " + getEditor() + ".",
+	Args:                  cobra.ExactArgs(1),
+	Run:                   editPassword,
+	DisableFlagsInUseLine: true,
 }
 
 func init() {

@@ -9,7 +9,7 @@ import (
 // mvCmd represents the mv command
 var (
 	mvCmd = &cobra.Command{
-		Use:   "mv",
+		Use:   "mv [--force,-f] old-path new-path",
 		Args:  cobra.ExactArgs(2),
 		Short: "Renames or moves old-path to new-path, optionally forcefully, selectively reencrypting.",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -18,6 +18,8 @@ var (
 				os.RemoveAll(s)
 			}
 		},
+		Aliases:               []string{"rename"},
+		DisableFlagsInUseLine: true,
 	}
 
 	ForceMv bool

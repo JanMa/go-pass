@@ -14,10 +14,12 @@ import (
 // showCmd represents the show command
 var (
 	showCmd = &cobra.Command{
-		Use:   "show",
-		Short: "Show existing password and optionally put it on the clipboard.",
-		Args:  cobra.MaximumNArgs(1),
-		Run:   showPassword,
+		Use:                   "show [--clip[=line-number],-c[=line-number]] [--qrcode[=line-number],-q[=line-number]] [pass-name]",
+		Short:                 "Show existing password and optionally put it on the clipboard.",
+		Args:                  cobra.MaximumNArgs(1),
+		Run:                   showPassword,
+		Aliases:               []string{"ls", "list"},
+		DisableFlagsInUseLine: true,
 	}
 
 	Copy   int

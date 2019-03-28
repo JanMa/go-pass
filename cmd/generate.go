@@ -17,14 +17,15 @@ import (
 // generateCmd represents the generate command
 var (
 	generateCmd = &cobra.Command{
-		Use:   "generate",
+		Use:   "generate [--no-symbols,-n] [--clip,-c] [--qrcode,-q] [--in-place,-i | --force,-f] pass-name [pass-length]",
 		Args:  cobra.RangeArgs(1, 2),
 		Short: "Generate a new password of pass-length (or 25 if unspecified) with optionally no symbols.",
 		Long: `Generate a new password of pass-length (or 25 if unspecified) with optionally no symbols.
 Optionally put it on the clipboard and clear board after 45 seconds.
 Prompt before overwriting existing password unless forced.
 Optionally replace only the first line of an existing file with a new password.`,
-		Run: generatePassword,
+		Run:                   generatePassword,
+		DisableFlagsInUseLine: true,
 	}
 
 	NoSymbols bool

@@ -9,9 +9,11 @@ import (
 
 // findCmd represents the find command
 var findCmd = &cobra.Command{
-	Use:   "find",
-	Short: "List passwords that match pass-names",
-	Run:   findPasswords,
+	Use:                   "find pass-names...",
+	Short:                 "List passwords that match pass-names",
+	Run:                   findPasswords,
+	Aliases:               []string{"search"},
+	DisableFlagsInUseLine: true,
 }
 
 func init() {

@@ -14,10 +14,11 @@ import (
 
 // grepCmd represents the grep command
 var grepCmd = &cobra.Command{
-	Use:   "grep [GREPOPTIONS]",
-	Args:  cobra.MinimumNArgs(1),
-	Short: "Search for password files containing search-string when decrypted.",
-	Run:   grepPasswords,
+	Use:                   "grep [GREPOPTIONS] search-string",
+	Args:                  cobra.MinimumNArgs(1),
+	Short:                 "Search for password files containing search-string when decrypted.",
+	Run:                   grepPasswords,
+	DisableFlagsInUseLine: true,
 }
 
 func init() {

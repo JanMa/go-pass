@@ -12,10 +12,12 @@ import (
 // rmCmd represents the rm command
 var (
 	rmCmd = &cobra.Command{
-		Use:   "rm",
-		Args:  cobra.ExactArgs(1),
-		Short: "Remove existing password or directory, optionally forcefully.",
-		Run:   rmPassword,
+		Use:                   "rm [--recursive,-r] [--force,-f] pass-name",
+		Args:                  cobra.ExactArgs(1),
+		Short:                 "Remove existing password or directory, optionally forcefully.",
+		Run:                   rmPassword,
+		Aliases:               []string{"delete", "remove"},
+		DisableFlagsInUseLine: true,
 	}
 
 	RecurseRm bool

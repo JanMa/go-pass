@@ -17,13 +17,15 @@ import (
 // insertCmd represents the insert command
 var (
 	insertCmd = &cobra.Command{
-		Use:   "insert",
+		Use:   "insert [--echo,-e | --multiline,-m] [--force,-f] pass-name",
 		Args:  cobra.ExactArgs(1),
 		Short: "Insert new password.",
 		Long: `Insert new password. Optionally, echo the password back to the console
 during entry. Or, optionally, the entry may be multiline. Prompt before
 overwriting existing password unless forced.`,
-		Run: insertPassword,
+		Run:                   insertPassword,
+		Aliases:               []string{"add"},
+		DisableFlagsInUseLine: true,
 	}
 	Echo        bool
 	MultiLine   bool
