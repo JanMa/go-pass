@@ -32,7 +32,7 @@ func init() {
 	cpCmd.Flags().BoolVarP(&ForceCp, "force", "f", false, "Forcefully copy password or directory.")
 }
 
-func copyPasswords(src, dst string, force bool) {
+func copyPasswords(src, dst string, force bool) (string, string) {
 	fromPath := util.GetPasswordStore() + "/" + src
 	toPath := util.GetPasswordStore() + "/" + dst
 	// src exists and is a directory
@@ -51,6 +51,7 @@ func copyPasswords(src, dst string, force bool) {
 		}
 		// walk dst directory
 		reEncryptDir(toPath, recv)
+		return fromPath, toPath
 		// src exists and is not a directory
 	} else if f, e := os.Stat(fromPath + ".gpg"); !os.IsNotExist(e) && !f.IsDir() {
 		// dst has a slash as suffix indicating it is a directory
@@ -70,10 +71,12 @@ func copyPasswords(src, dst string, force bool) {
 			os.Exit(1)
 		}
 		reEncryptFile(toPath+".gpg", recv)
+		return fromPath + ".gpg", toPath + ".gpg"
 	} else {
 		fmt.Printf("Error: %s is not in the password store.\n", src)
 		os.Exit(1)
 	}
+	return "", ""
 }
 
 func findGpgID(path string) string {
