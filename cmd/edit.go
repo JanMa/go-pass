@@ -62,7 +62,7 @@ func editPassword(cmd *cobra.Command, args []string) {
 	if err := os.Remove(tmpfile); err != nil {
 		fmt.Println(err)
 	}
-
+	gitAddFile(root, fmt.Sprintf("Edit %s with %s", args[0], getEditor()))
 }
 
 func getEditor() string {
