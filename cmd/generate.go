@@ -101,6 +101,12 @@ func generatePassword(cmd *cobra.Command, args []string) {
 		encryptPassword(pass+"\n", root)
 	}
 
+	verb := "Add"
+	if InPlace {
+		verb = "Replace"
+	}
+	gitAddFile(root, fmt.Sprintf("%s generated password for %s.", verb, args[0]))
+
 	if Clip {
 		if err := clipboard.WriteAll(pass); err != nil {
 			fmt.Println(err)
