@@ -3,10 +3,10 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/util"
-	git "gopkg.in/src-d/go-git.v4"
 )
 
 // gitCmd represents the git command
@@ -15,12 +15,11 @@ var gitCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
 		root := util.GetPasswordStore()
-		_, e := git.PlainOpen(root)
-		if e != nil {
-			fmt.Println(e)
+		gitStatus := exec.Command("git", "-C", root, "status")
+		if o, e := gitStatus.CombinedOutput(); e != nil {
+			fmt.Println(o)
 			os.Exit(1)
 		}
-
 	},
 }
 
