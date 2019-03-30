@@ -53,6 +53,7 @@ func copyPasswords(src, dst string, force bool) (string, string) {
 		}
 		// walk dst directory
 		reEncryptDir(toPath, recv)
+		gitAddFile(toPath, fmt.Sprintf("Copy %s to %s", src, dst))
 		return fromPath, toPath
 		// src exists and is not a directory
 	} else if f, e := os.Stat(fromPath + ".gpg"); !os.IsNotExist(e) && !f.IsDir() {
@@ -73,6 +74,7 @@ func copyPasswords(src, dst string, force bool) (string, string) {
 			os.Exit(1)
 		}
 		reEncryptFile(toPath+".gpg", recv)
+		gitAddFile(toPath+".gpg", fmt.Sprintf("Copy %s to %s", src, dst))
 		return fromPath + ".gpg", toPath + ".gpg"
 	} else {
 		fmt.Printf("Error: %s is not in the password store.\n", src)

@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -16,6 +18,7 @@ var (
 			s, _ := copyPasswords(args[0], args[1], ForceMv)
 			if len(s) > 0 {
 				os.RemoveAll(s)
+				gitAddFile(strings.TrimRight(s, "/"), fmt.Sprintf("Remove %s", args[0]))
 			}
 		},
 		Aliases:               []string{"rename"},
