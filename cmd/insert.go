@@ -57,6 +57,7 @@ func insertPassword(cmd *cobra.Command, args []string) {
 	} else {
 		encryptPassword(enterPassword(args[0])+"\n", root)
 	}
+	gitAddFile(root, fmt.Sprintf("Add given password for %s to store.", args[0]))
 }
 
 func getRecepientOptsArray() []string {
@@ -138,5 +139,5 @@ func encryptMultiLine(file string) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	encryptPassword(strings.Join(pass, "\n"), file)
+	encryptPassword(strings.Join(pass, "\n")+"\n", file)
 }
