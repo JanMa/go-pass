@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/util"
@@ -11,6 +12,7 @@ import (
 var findCmd = &cobra.Command{
 	Use:                   "find pass-names...",
 	Short:                 "List passwords that match pass-names",
+	Args:                  cobra.MinimumNArgs(1),
 	Run:                   findPasswords,
 	Aliases:               []string{"search"},
 	DisableFlagsInUseLine: true,
@@ -22,16 +24,13 @@ func init() {
 
 func findPasswords(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore()
-	pattern := ""
-	if len(args) > 0 {
-		for _, a := range args {
-			pattern += a
-		}
+	pattern := "*"
+	for _, a := range args {
+		pattern += a + "*|*"
 	}
-	// TODO: don't use external program
-	lines := util.RunCommand("tree", "-C", "-l", "--noreport", "-P", pattern+"*", "--prune", "--matchdirs", "--ignore-case", root)
-	fmt.Println("Search Terms:", pattern)
-	for i := 1; i < len(lines); i++ {
-		util.PrintLine(lines[i])
+	lines := util.RunCommand("tree", "-C", "-l", "--noreport", "-P", strings.TrimSuffix(pattern, "|*"), "--prune", "--matchdirs", "--ignore-case", root)
+	fmt.Println("Search Terms:", strings.Join(args, " "))
+	for _, l := range lines {
+		util.PrintLine(l)
 	}
 }
