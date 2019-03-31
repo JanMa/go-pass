@@ -58,4 +58,5 @@ func rmPassword(cmd *cobra.Command, args []string) {
 		fmt.Println(e)
 		os.Exit(1)
 	}
+	gitAddFile(strings.TrimRight(passFile, "/"), fmt.Sprintf("Remove %s from store.", args[0]))
 }
