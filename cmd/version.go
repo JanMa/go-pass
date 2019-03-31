@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/spf13/cobra"
 )
@@ -12,7 +13,8 @@ var (
 		Use:   "version",
 		Short: "Show version information",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(Version)
+			fmt.Println("Version:\t", Version)
+			fmt.Println("Go version:\t", runtime.Version())
 		},
 	}
 
