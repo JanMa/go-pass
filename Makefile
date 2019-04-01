@@ -2,10 +2,7 @@ VERSION := $(shell cat ./VERSION)
 BUILDFLAGS := -ldflags "-s -w -X gitlab.com/JanMa/go-pass/cmd.Version=${VERSION}"
 
 build:
-		GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -mod=vendor ${BUILDFLAGS}
-
-darwin:
-		GO111MODULE=on CGO_ENABLED=0 GOOS=darwin go build -mod=vendor ${BUILDFLAGS}
+		GO111MODULE=on CGO_ENABLED=0 go build -mod=vendor ${BUILDFLAGS}
 
 get:
 		GO111MODULE=on go get -v

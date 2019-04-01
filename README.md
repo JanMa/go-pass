@@ -33,16 +33,14 @@ Use "go-pass [command] --help" for more information about a command.
 ## Building
 
 For a convenient usage, the repository includes a Makefile. 
-
-### Linux
-
-On Linux type:
 ```
-make build
+git clone https://gitlab.com/JanMa/go-pass.git
+cd go-pass
+make
 ```
 
-### MacOS
-To build go-pass for macOS type
+## Installing
+After checking out the repository, you can install `go-pass` with
 ```
-make darwin
+make install
 ```
