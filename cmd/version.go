@@ -17,10 +17,4 @@ var (
 			fmt.Println("Go version:\t", runtime.Version())
 		},
 	}
-
-	Version string
 )
-
-func init() {
-	rootCmd.AddCommand(versionCmd)
-}

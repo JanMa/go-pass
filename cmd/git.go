@@ -40,10 +40,6 @@ var gitCmd = &cobra.Command{
 	},
 }
 
-func init() {
-	rootCmd.AddCommand(gitCmd)
-}
-
 func gitAddFile(path, msg string) error {
 	r := util.GetPasswordStore()
 	if f, e := os.Stat(r + "/.git"); os.IsNotExist(e) || !f.IsDir() {

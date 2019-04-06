@@ -18,10 +18,6 @@ var (
 	}
 )
 
-func init() {
-	rootCmd.AddCommand(lsCmd)
-}
-
 func listPasswords(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore()
 	path := "Password Store"

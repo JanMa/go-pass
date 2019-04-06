@@ -22,4 +22,17 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.AddCommand(cpCmd)
+	rootCmd.AddCommand(editCmd)
+	rootCmd.AddCommand(findCmd)
+	rootCmd.AddCommand(generateCmd)
+	rootCmd.AddCommand(gitCmd)
+	rootCmd.AddCommand(grepCmd)
+	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(insertCmd)
+	rootCmd.AddCommand(lsCmd)
+	rootCmd.AddCommand(mvCmd)
+	rootCmd.AddCommand(rmCmd)
+	rootCmd.AddCommand(showCmd)
+	rootCmd.AddCommand(versionCmd)
 }

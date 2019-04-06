@@ -21,10 +21,6 @@ var grepCmd = &cobra.Command{
 	DisableFlagsInUseLine: true,
 }
 
-func init() {
-	rootCmd.AddCommand(grepCmd)
-}
-
 func grepPasswords(cmd *cobra.Command, args []string) {
 	grepArgs := strings.Join(args, " ")
 	err := filepath.Walk(util.GetPasswordStore(), func(path string, info os.FileInfo, err error) error {

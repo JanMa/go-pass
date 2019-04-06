@@ -18,10 +18,6 @@ var findCmd = &cobra.Command{
 	DisableFlagsInUseLine: true,
 }
 
-func init() {
-	rootCmd.AddCommand(findCmd)
-}
-
 func findPasswords(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore()
 	pattern := "*"

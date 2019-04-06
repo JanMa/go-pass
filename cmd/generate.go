@@ -27,12 +27,6 @@ Optionally replace only the first line of an existing file with a new password.`
 		Run:                   generatePassword,
 		DisableFlagsInUseLine: true,
 	}
-
-	NoSymbols bool
-	Clip      bool
-	InPlace   bool
-	ForceGen  bool
-	GenQRCode bool
 )
 
 const (
@@ -52,16 +46,6 @@ const (
 	CharacterSetNoSymbols = LowerLetters + UpperLetters + Digits
 )
 
-func init() {
-	rootCmd.AddCommand(generateCmd)
-
-	generateCmd.Flags().BoolVarP(&NoSymbols, "no-symbols", "n", false, "Generate password with no symbols.")
-	generateCmd.Flags().BoolVarP(&Clip, "clip", "c", false, "Put generated password on the clipboard.")
-	generateCmd.Flags().BoolVarP(&InPlace, "in-place", "i", false, "Replace only the first line of an existing file with a new password.")
-	generateCmd.Flags().BoolVarP(&ForceGen, "force", "f", false, "Forcefully overwrite existing password.")
-	generateCmd.Flags().BoolVarP(&GenQRCode, "qrcode", "q", false, "Display output as QR code.")
-
-}
 func generatePassword(cmd *cobra.Command, args []string) {
 	length := 25
 	if len(args) > 1 {

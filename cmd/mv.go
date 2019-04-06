@@ -24,12 +24,4 @@ var (
 		Aliases:               []string{"rename"},
 		DisableFlagsInUseLine: true,
 	}
-
-	ForceMv bool
 )
-
-func init() {
-	rootCmd.AddCommand(mvCmd)
-
-	mvCmd.Flags().BoolVarP(&ForceMv, "force", "f", false, "Forcefully copy password or directory.")
-}

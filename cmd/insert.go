@@ -27,18 +27,7 @@ overwriting existing password unless forced.`,
 		Aliases:               []string{"add"},
 		DisableFlagsInUseLine: true,
 	}
-	Echo        bool
-	MultiLine   bool
-	ForceInsert bool
 )
-
-func init() {
-	rootCmd.AddCommand(insertCmd)
-
-	insertCmd.Flags().BoolVarP(&Echo, "echo", "e", false, "Echo password back to console")
-	insertCmd.Flags().BoolVarP(&MultiLine, "multiline", "m", false, "Multiline input")
-	insertCmd.Flags().BoolVarP(&ForceInsert, "force", "f", false, "Overwrite existing password without prompt")
-}
 
 func insertPassword(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore() + "/" + args[0] + ".gpg"

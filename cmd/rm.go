@@ -19,17 +19,7 @@ var (
 		Aliases:               []string{"delete", "remove"},
 		DisableFlagsInUseLine: true,
 	}
-
-	RecurseRm bool
-	ForceRm   bool
 )
-
-func init() {
-	rootCmd.AddCommand(rmCmd)
-
-	rmCmd.Flags().BoolVarP(&RecurseRm, "recursive", "r", false, "Delete recursively if it is a directory.")
-	rmCmd.Flags().BoolVarP(&ForceRm, "force", "f", false, "Forcefully remove password or directory.")
-}
 
 func rmPassword(cmd *cobra.Command, args []string) {
 	passDir := util.GetPasswordStore() + "/" + args[0]

@@ -21,19 +21,7 @@ var (
 		Aliases:               []string{"ls", "list"},
 		DisableFlagsInUseLine: true,
 	}
-
-	Copy   int
-	QRCode int
 )
-
-func init() {
-	rootCmd.AddCommand(showCmd)
-
-	showCmd.Flags().IntVarP(&Copy, "clip", "c", 0, "Copy password to clipboard")
-	showCmd.Flags().Lookup("clip").NoOptDefVal = "1"
-	showCmd.Flags().IntVarP(&QRCode, "qrcode", "q", 0, "Display output as QR code")
-	showCmd.Flags().Lookup("qrcode").NoOptDefVal = "1"
-}
 
 func showPassword(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore()

@@ -24,15 +24,7 @@ var (
 		Aliases:               []string{"copy"},
 		DisableFlagsInUseLine: true,
 	}
-
-	ForceCp bool
 )
-
-func init() {
-	rootCmd.AddCommand(cpCmd)
-
-	cpCmd.Flags().BoolVarP(&ForceCp, "force", "f", false, "Forcefully copy password or directory.")
-}
 
 func copyPasswords(src, dst string, force bool) (string, string) {
 	fromPath := util.GetPasswordStore() + "/" + src

@@ -24,14 +24,7 @@ Selectively reencrypt existing passwords using new gpg-id.`,
 		Run:                   initPasswordStore,
 		DisableFlagsInUseLine: true,
 	}
-
-	Subdir string
 )
-
-func init() {
-	rootCmd.AddCommand(initCmd)
-	initCmd.Flags().StringVarP(&Subdir, "path", "p", "", "A specific gpg-id or set of gpg-ids is assigned for that specific sub folder of the password store")
-}
 
 func initPasswordStore(cmd *cobra.Command, args []string) {
 	gpgKeys := getKeys(args)

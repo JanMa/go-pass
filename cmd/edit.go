@@ -20,10 +20,6 @@ var editCmd = &cobra.Command{
 	DisableFlagsInUseLine: true,
 }
 
-func init() {
-	rootCmd.AddCommand(editCmd)
-}
-
 func editPassword(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore() + "/" + args[0] + ".gpg"
 	tmpfile := util.TmpFile()
