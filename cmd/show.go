@@ -11,18 +11,6 @@ import (
 	"gitlab.com/JanMa/go-pass/util"
 )
 
-// showCmd represents the show command
-var (
-	showCmd = &cobra.Command{
-		Use:                   "show [--clip[=line-number],-c[=line-number]] [--qrcode[=line-number],-q[=line-number]] [pass-name]",
-		Short:                 "Show existing password and optionally put it on the clipboard.",
-		Args:                  cobra.MaximumNArgs(1),
-		Run:                   showPassword,
-		Aliases:               []string{"ls", "list"},
-		DisableFlagsInUseLine: true,
-	}
-)
-
 func showPassword(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore()
 	if len(args) > 0 {

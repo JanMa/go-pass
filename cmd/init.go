@@ -13,19 +13,6 @@ import (
 	"gitlab.com/JanMa/go-pass/util"
 )
 
-// initCmd represents the init command
-var (
-	initCmd = &cobra.Command{
-		Use:   "init [--path=subfolder,-p subfolder] gpg-id...",
-		Args:  cobra.MinimumNArgs(1),
-		Short: "Initialize new password storage and use gpg-id for encryption.",
-		Long: `Initialize new password storage and use gpg-id for encryption.
-Selectively reencrypt existing passwords using new gpg-id.`,
-		Run:                   initPasswordStore,
-		DisableFlagsInUseLine: true,
-	}
-)
-
 func initPasswordStore(cmd *cobra.Command, args []string) {
 	gpgKeys := getKeys(args)
 	root := util.GetPasswordStore()

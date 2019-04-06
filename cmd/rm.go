@@ -9,18 +9,6 @@ import (
 	"gitlab.com/JanMa/go-pass/util"
 )
 
-// rmCmd represents the rm command
-var (
-	rmCmd = &cobra.Command{
-		Use:                   "rm [--recursive,-r] [--force,-f] pass-name",
-		Args:                  cobra.ExactArgs(1),
-		Short:                 "Remove existing password or directory, optionally forcefully.",
-		Run:                   rmPassword,
-		Aliases:               []string{"delete", "remove"},
-		DisableFlagsInUseLine: true,
-	}
-)
-
 func rmPassword(cmd *cobra.Command, args []string) {
 	passDir := util.GetPasswordStore() + "/" + args[0]
 	passFile := passDir + ".gpg"

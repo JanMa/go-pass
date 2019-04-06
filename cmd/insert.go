@@ -14,21 +14,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// insertCmd represents the insert command
-var (
-	insertCmd = &cobra.Command{
-		Use:   "insert [--echo,-e | --multiline,-m] [--force,-f] pass-name",
-		Args:  cobra.ExactArgs(1),
-		Short: "Insert new password.",
-		Long: `Insert new password. Optionally, echo the password back to the console
-during entry. Or, optionally, the entry may be multiline. Prompt before
-overwriting existing password unless forced.`,
-		Run:                   insertPassword,
-		Aliases:               []string{"add"},
-		DisableFlagsInUseLine: true,
-	}
-)
-
 func insertPassword(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore() + "/" + args[0] + ".gpg"
 	if f, e := os.Stat(root); !os.IsNotExist(e) && !f.IsDir() {

@@ -12,15 +12,6 @@ import (
 	"gitlab.com/JanMa/go-pass/util"
 )
 
-// grepCmd represents the grep command
-var grepCmd = &cobra.Command{
-	Use:                   "grep [GREPOPTIONS] search-string",
-	Args:                  cobra.MinimumNArgs(1),
-	Short:                 "Search for password files containing search-string when decrypted.",
-	Run:                   grepPasswords,
-	DisableFlagsInUseLine: true,
-}
-
 func grepPasswords(cmd *cobra.Command, args []string) {
 	grepArgs := strings.Join(args, " ")
 	err := filepath.Walk(util.GetPasswordStore(), func(path string, info os.FileInfo, err error) error {

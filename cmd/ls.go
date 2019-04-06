@@ -6,18 +6,6 @@ import (
 	"gitlab.com/JanMa/go-pass/util"
 )
 
-// lsCmd represents the ls command
-var (
-	lsCmd = &cobra.Command{
-		Use:                   "ls [pass-name]",
-		Aliases:               []string{"list"},
-		Short:                 "List passwords.",
-		Args:                  cobra.MaximumNArgs(1),
-		Run:                   listPasswords,
-		DisableFlagsInUseLine: true,
-	}
-)
-
 func listPasswords(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore()
 	path := "Password Store"

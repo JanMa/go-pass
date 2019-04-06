@@ -8,16 +8,6 @@ import (
 	"gitlab.com/JanMa/go-pass/util"
 )
 
-// findCmd represents the find command
-var findCmd = &cobra.Command{
-	Use:                   "find pass-names...",
-	Short:                 "List passwords that match pass-names",
-	Args:                  cobra.MinimumNArgs(1),
-	Run:                   findPasswords,
-	Aliases:               []string{"search"},
-	DisableFlagsInUseLine: true,
-}
-
 func findPasswords(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore()
 	pattern := "*"

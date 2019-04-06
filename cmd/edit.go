@@ -11,15 +11,6 @@ import (
 	"gitlab.com/JanMa/go-pass/util"
 )
 
-// editCmd represents the edit command
-var editCmd = &cobra.Command{
-	Use:                   "edit pass-name",
-	Short:                 "Insert a new password or edit an existing password using " + getEditor() + ".",
-	Args:                  cobra.ExactArgs(1),
-	Run:                   editPassword,
-	DisableFlagsInUseLine: true,
-}
-
 func editPassword(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore() + "/" + args[0] + ".gpg"
 	tmpfile := util.TmpFile()

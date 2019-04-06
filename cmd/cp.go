@@ -7,23 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/copy"
 	"gitlab.com/JanMa/go-pass/util"
-)
-
-// cpCmd represents the cp command
-var (
-	cpCmd = &cobra.Command{
-		Use:   "cp [--force, -f] old-path new-path",
-		Args:  cobra.ExactArgs(2),
-		Short: "Copies old-path to new-path, optionally forcefully, selectively reencrypting.",
-		Run: func(cmd *cobra.Command, args []string) {
-			copyPasswords(args[0], args[1], ForceCp)
-		},
-		Aliases:               []string{"copy"},
-		DisableFlagsInUseLine: true,
-	}
 )
 
 func copyPasswords(src, dst string, force bool) (string, string) {
