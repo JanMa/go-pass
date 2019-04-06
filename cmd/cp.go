@@ -47,10 +47,7 @@ func copyPasswords(src, dst string, force bool) (string, string) {
 		fmt.Println(fromPath)
 		copy.Copy(fromPath, toPath)
 		recv, e := getRecipientsFromGpgID(findGpgID(toPath))
-		if e != nil {
-			fmt.Println(1)
-			os.Exit(1)
-		}
+		exitOnError(e)
 		// walk dst directory
 		reEncryptDir(toPath, recv)
 		gitAddFile(toPath, fmt.Sprintf("Copy %s to %s", src, dst))
@@ -69,10 +66,7 @@ func copyPasswords(src, dst string, force bool) (string, string) {
 		fmt.Println(fromPath + ".gpg")
 		copy.Copy(fromPath+".gpg", toPath+".gpg")
 		recv, e := getRecipientsFromGpgID(findGpgID(toPath))
-		if e != nil {
-			fmt.Println(1)
-			os.Exit(1)
-		}
+		exitOnError(e)
 		reEncryptFile(toPath+".gpg", recv)
 		gitAddFile(toPath+".gpg", fmt.Sprintf("Copy %s to %s", src, dst))
 		return fromPath + ".gpg", toPath + ".gpg"

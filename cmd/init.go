@@ -41,17 +41,11 @@ func initPasswordStore(cmd *cobra.Command, args []string) {
 	}
 	gpgID := root + "/.gpg-id"
 	if _, e := os.Stat(gpgID); os.IsExist(e) {
-		if e := os.Remove(gpgID); e != nil {
-			fmt.Println(e)
-			os.Exit(1)
-		}
+		exitOnError(os.Remove(gpgID))
 	}
 	f, e := os.Create(gpgID)
 	defer f.Close()
-	if e != nil {
-		fmt.Println(e)
-		os.Exit(1)
-	}
+	exitOnError(e)
 	f.Write([]byte(strings.Join(args, "\n") + "\n"))
 	fmt.Printf("Password store initialized for %s\n", strings.Trim(strings.Join(args, ", "), "\n"))
 	gitAddFile(gpgID, fmt.Sprintf("Set GPG id to %s.", strings.Trim(strings.Join(args, ", "), "\n")))
@@ -66,10 +60,7 @@ func getKeys(recipients []string) []string {
 		gpg.Args = append(gpg.Args, r)
 	}
 	k, e := gpg.Output()
-	if e != nil {
-		fmt.Println(e)
-		os.Exit(1)
-	}
+	exitOnError(e)
 	match := re.FindAllSubmatch(k, -1)
 
 	gpgKeys := []string{}
@@ -96,10 +87,7 @@ func reEncryptFile(path string, keys []string) {
 			gpg.Args = append(gpg.Args, r)
 		}
 		stdin, err := gpg.StdinPipe()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		exitOnError(err)
 		go func() {
 			defer stdin.Close()
 			io.WriteString(stdin, strings.Join(pass, "\n"))

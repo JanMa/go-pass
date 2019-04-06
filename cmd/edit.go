@@ -29,10 +29,7 @@ func editPassword(cmd *cobra.Command, args []string) {
 	tmpfile := util.TmpFile()
 	if f, e := os.Stat(root); !os.IsNotExist(e) && !f.IsDir() {
 		decrypt := exec.Command("gpg", "--quiet", "-o", tmpfile, "-d", root)
-		if err := decrypt.Run(); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		exitOnError(decrypt.Run())
 	}
 	gpg := exec.Command("gpg2",
 		"-e", "-o", strings.ReplaceAll(root, " ", `\ `),
@@ -45,23 +42,11 @@ func editPassword(cmd *cobra.Command, args []string) {
 	editor.Stdin = os.Stdin
 	editor.Stdout = os.Stdout
 	editor.Stderr = os.Stderr
-	if err := editor.Start(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	if err := editor.Wait(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
+	exitOnError(editor.Start())
+	exitOnError(editor.Wait())
 	os.MkdirAll(filepath.Dir(root), 0755)
-	if err := gpg.Run(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	if err := os.Remove(tmpfile); err != nil {
-		fmt.Println(err)
-	}
+	exitOnError(gpg.Run())
+	exitOnError(os.Remove(tmpfile))
 	gitAddFile(root, fmt.Sprintf("Edit %s with %s", args[0], getEditor()))
 }
 

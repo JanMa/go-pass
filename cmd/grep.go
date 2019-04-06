@@ -38,10 +38,7 @@ func grepPasswords(cmd *cobra.Command, args []string) {
 			p := strings.Join(util.RunCommand("gpg", "-dq", path), "\n")
 			grep := exec.Command("grep", "--color=always", grepArgs)
 			stdin, err := grep.StdinPipe()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
+			exitOnError(err)
 			go func() {
 				defer stdin.Close()
 				io.WriteString(stdin, p)

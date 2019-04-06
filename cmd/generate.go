@@ -79,9 +79,7 @@ func generatePassword(cmd *cobra.Command, args []string) {
 	root := util.GetPasswordStore() + "/" + args[0] + ".gpg"
 	if f, e := os.Stat(root); !os.IsNotExist(e) && !f.IsDir() {
 		overwrite := func() {
-			if err := os.Remove(root); err != nil {
-				fmt.Println(err)
-			}
+			exitOnError(os.Remove(root))
 		}
 		if ForceGen && !InPlace || !ForceGen && !InPlace &&
 			util.YesNo(fmt.Sprintf("An entry already exists for %s. Overwrite it?", args[0])) {
@@ -108,16 +106,10 @@ func generatePassword(cmd *cobra.Command, args []string) {
 	gitAddFile(root, fmt.Sprintf("%s generated password for %s.", verb, args[0]))
 
 	if Clip {
-		if err := clipboard.WriteAll(pass); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		exitOnError(clipboard.WriteAll(pass))
 	} else if GenQRCode {
 		qr, err := qrcode.New(pass, qrcode.Low)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		exitOnError(err)
 		fmt.Print(qr.ToSmallString(false))
 	} else {
 		fmt.Printf("The generated password for %s is:\n%s\n", args[0], pass)
@@ -132,10 +124,7 @@ func randomString(length int, symbols bool) string {
 	}
 	for i := 0; i < length; i++ {
 		n, err := rand.Int(rand.Reader, big.NewInt(int64(len(set))))
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		exitOnError(err)
 		pass += string(set[n.Int64()])
 	}
 	return pass
