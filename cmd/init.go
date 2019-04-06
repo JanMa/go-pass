@@ -76,9 +76,7 @@ func reEncryptFile(path string, keys []string) {
 	if !matchKeys(string(currentKeys), keys) {
 		fmt.Printf("%s: reencrypting to %s\n", filepath.Base(path), strings.Join(keys, ", "))
 		pass := util.RunCommand("gpg", "-dq", path)
-		if e := os.Remove(path); e != nil {
-			fmt.Println(e)
-		}
+		exitOnError(os.Remove(path))
 		gpg := exec.Command("gpg2",
 			"-e", "-o", path,
 			"--quiet", "--yes", "--compress-algo=none", "--no-encrypt-to")
