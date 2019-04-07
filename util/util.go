@@ -45,6 +45,11 @@ func GetPasswordStore() string {
 	if len(env) == 0 {
 		env = getHomeDir() + "/.password-store"
 	}
+	if f, e := os.Stat(env); os.IsNotExist(e) || !f.IsDir() {
+		if err := os.MkdirAll(env, 0755); err != nil {
+			os.Exit(1)
+		}
+	}
 	return env
 }
 
