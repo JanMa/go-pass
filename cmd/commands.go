@@ -18,7 +18,8 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			showPassword(cmd, args)
 		},
-		Example: "",
+		Example:                "",
+		BashCompletionFunction: bash_completion_func,
 	}
 	// versionCmd represents the version command
 	versionCmd = &cobra.Command{
@@ -149,6 +150,23 @@ overwriting existing password unless forced.`,
 		Aliases:               []string{"ls", "list"},
 		DisableFlagsInUseLine: true,
 	}
+	// completionCmd represents the completion command
+	completionCmd = &cobra.Command{
+		Use:   "completion",
+		Short: "Generates bash completion scripts",
+		Long: `To load completion run
+
+. <(go-pass completion)
+
+To configure your bash shell to load completions for each session add to your bashrc
+
+# ~/.bashrc or ~/.profile
+. <(go-pass completion)
+`,
+		Run: func(cmd *cobra.Command, args []string) {
+			rootCmd.GenBashCompletion(os.Stdout)
+		},
+	}
 )
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -171,4 +189,5 @@ func init() {
 	rootCmd.AddCommand(rmCmd)
 	rootCmd.AddCommand(showCmd)
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(completionCmd)
 }
