@@ -17,6 +17,7 @@ var (
 	RecurseRm   bool
 	Subdir      string
 	Version     string
+	Zsh         bool
 )
 
 func init() {
@@ -50,4 +51,7 @@ func init() {
 
 	//cp flags
 	cpCmd.Flags().BoolVarP(&ForceCp, "force", "f", false, "Forcefully copy password or directory.")
+
+	//completion flags
+	completionCmd.Flags().BoolVarP(&Zsh, "zsh", "z", false, "Generate Zsh completion.")
 }

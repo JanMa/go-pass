@@ -153,18 +153,27 @@ overwriting existing password unless forced.`,
 	// completionCmd represents the completion command
 	completionCmd = &cobra.Command{
 		Use:   "completion",
-		Short: "Generates bash completion scripts",
-		Long: `To load completion run
+		Short: "Generates completion scripts",
+		Long: `To load bash completion run
 
-. <(go-pass completion)
+$ . <(go-pass completion)
 
 To configure your bash shell to load completions for each session add to your bashrc
 
 # ~/.bashrc or ~/.profile
-. <(go-pass completion)
+$ . <(go-pass completion)
+
+To load zsh completion run
+
+# go-pass completion -z > /usr/share/zsh/site-functions/_go-pass
+$ autoload -U compinit && compinit
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			rootCmd.GenBashCompletion(os.Stdout)
+			if Zsh {
+				rootCmd.GenZshCompletion(os.Stdout)
+			} else {
+				rootCmd.GenBashCompletion(os.Stdout)
+			}
 		},
 	}
 )
