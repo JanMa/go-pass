@@ -176,6 +176,14 @@ $ autoload -U compinit && compinit
 			}
 		},
 	}
+
+	//otpCmd represents the otp command
+	otpCmd = &cobra.Command{
+		Use:   "otp",
+		Short: "Generate OTP code",
+		Args:  cobra.ExactArgs(1),
+		Run:   genOtpCode,
+	}
 )
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -199,4 +207,5 @@ func init() {
 	rootCmd.AddCommand(showCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(completionCmd)
+	rootCmd.AddCommand(otpCmd)
 }

@@ -13,6 +13,7 @@ var (
 	InPlace     bool
 	MultiLine   bool
 	NoSymbols   bool
+	OtpClip     bool
 	QRCode      int
 	RecurseRm   bool
 	Subdir      string
@@ -54,4 +55,7 @@ func init() {
 
 	//completion flags
 	completionCmd.Flags().BoolVarP(&Zsh, "zsh", "z", false, "Generate Zsh completion.")
+
+	//otp flags
+	otpCmd.Flags().BoolVarP(&OtpClip, "clip", "c", false, "Put OTP code on the clipboard.")
 }
