@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/pkg/git"
-	"gitlab.com/JanMa/go-pass/util"
+	"gitlab.com/JanMa/go-pass/pkg/util"
 )
 
 func rmPassword(cmd *cobra.Command, args []string) {

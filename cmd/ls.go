@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"gitlab.com/JanMa/go-pass/util"
+	"gitlab.com/JanMa/go-pass/pkg/util"
 )
 
 func listPasswords(cmd *cobra.Command, args []string) {

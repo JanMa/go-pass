@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"gitlab.com/JanMa/go-pass/util"
+	"gitlab.com/JanMa/go-pass/pkg/util"
 )
 
 func findPasswords(cmd *cobra.Command, args []string) {

@@ -9,7 +9,7 @@ import (
 
 	"gitlab.com/JanMa/go-pass/pkg/copy"
 	"gitlab.com/JanMa/go-pass/pkg/git"
-	"gitlab.com/JanMa/go-pass/util"
+	"gitlab.com/JanMa/go-pass/pkg/util"
 )
 
 func copyPasswords(src, dst string, force bool) (string, string) {

@@ -8,7 +8,7 @@ import (
 	"github.com/atotto/clipboard"
 	qrcode "github.com/skip2/go-qrcode"
 	"github.com/spf13/cobra"
-	"gitlab.com/JanMa/go-pass/util"
+	"gitlab.com/JanMa/go-pass/pkg/util"
 )
 
 func showPassword(cmd *cobra.Command, args []string) {
