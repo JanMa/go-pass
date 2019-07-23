@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"gitlab.com/JanMa/go-pass/pkg/git"
 	"gitlab.com/JanMa/go-pass/util"
 )
 
@@ -28,9 +29,9 @@ func initPasswordStore(cmd *cobra.Command, args []string) {
 	exitOnError(e)
 	f.Write([]byte(strings.Join(args, "\n") + "\n"))
 	fmt.Printf("Password store initialized for %s\n", strings.Trim(strings.Join(args, ", "), "\n"))
-	gitAddFile(gpgID, fmt.Sprintf("Set GPG id to %s.", strings.Trim(strings.Join(args, ", "), "\n")))
+	git.AddFile(gpgID, fmt.Sprintf("Set GPG id to %s.", strings.Trim(strings.Join(args, ", "), "\n")))
 	reEncryptDir(root, gpgKeys)
-	gitAddFile(root, fmt.Sprintf("Reencrypt password store using new GPG id %s.", strings.Trim(strings.Join(args, ", "), "\n")))
+	git.AddFile(root, fmt.Sprintf("Reencrypt password store using new GPG id %s.", strings.Trim(strings.Join(args, ", "), "\n")))
 }
 
 func getKeys(recipients []string) []string {

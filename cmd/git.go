@@ -17,11 +17,11 @@ func gitCommand(cmd *cobra.Command, args []string) {
 		fmt.Printf("Error: the password store is not a git repository. Try \"go-pass git init\".\n")
 		os.Exit(1)
 	}
-	cmd := exec.Command("git", "-C", root)
+	run := exec.Command("git", "-C", root)
 	for _, a := range args {
-		cmd.Args = append(cmd.Args, a)
+		run.Args = append(run.Args, a)
 	}
-	o, _ := cmd.CombinedOutput()
+	o, _ := run.CombinedOutput()
 	fmt.Print(string(o))
 	if args[0] == "init" {
 		git.AddFile(root, "Add current contents of password store.")

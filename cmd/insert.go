@@ -3,7 +3,6 @@ package cmd
 import (
 	"bufio"
 	"fmt"
-	"gitlab.com/JanMa/go-pass/util"
 	"golang.org/x/crypto/ssh/terminal"
 	"io"
 	"os"
@@ -12,6 +11,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"gitlab.com/JanMa/go-pass/pkg/git"
+	"gitlab.com/JanMa/go-pass/util"
 )
 
 func insertPassword(cmd *cobra.Command, args []string) {
@@ -29,7 +30,7 @@ func insertPassword(cmd *cobra.Command, args []string) {
 	} else {
 		encryptPassword(enterPassword(args[0])+"\n", root)
 	}
-	gitAddFile(root, fmt.Sprintf("Add given password for %s to store.", args[0]))
+	git.AddFile(root, fmt.Sprintf("Add given password for %s to store.", args[0]))
 }
 
 func getRecepientOptsArray() []string {

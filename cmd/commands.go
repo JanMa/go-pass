@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"gitlab.com/JanMa/go-pass/pkg/git"
 )
 
 var (
@@ -126,7 +127,7 @@ overwriting existing password unless forced.`,
 			s, _ := copyPasswords(args[0], args[1], ForceMv)
 			if len(s) > 0 {
 				os.RemoveAll(s)
-				gitAddFile(strings.TrimRight(s, "/"), fmt.Sprintf("Remove %s from store.", args[0]))
+				git.AddFile(strings.TrimRight(s, "/"), fmt.Sprintf("Remove %s from store.", args[0]))
 			}
 		},
 		Aliases:               []string{"rename"},
