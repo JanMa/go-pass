@@ -8,16 +8,24 @@ import (
 
 	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/pkg/git"
+	"gitlab.com/JanMa/go-pass/pkg/store"
 )
 
 var (
+	// PasswordStore the global password store
+	PasswordStore *store.Store
+
 	// rootCmd represents the base command when called without any subcommands
 	rootCmd = &cobra.Command{
 		Use:   "go-pass [subfolder | command]",
 		Short: "go-pass is a pass clone written in Go",
 		Args:  cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			showPassword(cmd, args)
+			if len(args) > 0 {
+				showPassword(cmd, args)
+			} else {
+				listPasswords(cmd, args)
+			}
 		},
 		Example:                "",
 		BashCompletionFunction: bash_completion_func,
@@ -146,7 +154,7 @@ overwriting existing password unless forced.`,
 	showCmd = &cobra.Command{
 		Use:                   "show [--clip[=line-number],-c[=line-number]] [--qrcode[=line-number],-q[=line-number]] [pass-name]",
 		Short:                 "Show existing password and optionally put it on the clipboard.",
-		Args:                  cobra.MaximumNArgs(1),
+		Args:                  cobra.ExactArgs(1),
 		Run:                   showPassword,
 		Aliases:               []string{"ls", "list"},
 		DisableFlagsInUseLine: true,
@@ -194,6 +202,24 @@ func Execute() {
 }
 
 func init() {
+	var err error
+	p, err := store.GetPasswordStore()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	PasswordStore, err = store.New(p)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	err = PasswordStore.Fill()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	rootCmd.AddCommand(cpCmd)
 	rootCmd.AddCommand(editCmd)
 	rootCmd.AddCommand(findCmd)
