@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitlab.com/JanMa/go-pass/copy"
+	"gitlab.com/JanMa/go-pass/pkg/copy"
+	"gitlab.com/JanMa/go-pass/pkg/git"
 	"gitlab.com/JanMa/go-pass/util"
 )
 
@@ -27,7 +28,7 @@ func copyPasswords(src, dst string, force bool) (string, string) {
 		exitOnError(e)
 		// walk dst directory
 		reEncryptDir(toPath, recv)
-		gitAddFile(toPath, fmt.Sprintf("Copy %s to %s", src, dst))
+		git.AddFile(toPath, fmt.Sprintf("Copy %s to %s", src, dst))
 		return fromPath, toPath
 		// src exists and is not a directory
 	} else if f, e := os.Stat(fromPath + ".gpg"); !os.IsNotExist(e) && !f.IsDir() {
@@ -45,7 +46,7 @@ func copyPasswords(src, dst string, force bool) (string, string) {
 		recv, e := getRecipientsFromGpgID(findGpgID(toPath))
 		exitOnError(e)
 		reEncryptFile(toPath+".gpg", recv)
-		gitAddFile(toPath+".gpg", fmt.Sprintf("Copy %s to %s", src, dst))
+		git.AddFile(toPath+".gpg", fmt.Sprintf("Copy %s to %s", src, dst))
 		return fromPath + ".gpg", toPath + ".gpg"
 	} else {
 		fmt.Printf("Error: %s is not in the password store.\n", src)

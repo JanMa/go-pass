@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"gitlab.com/JanMa/go-pass/pkg/git"
 	"gitlab.com/JanMa/go-pass/util"
 )
 
@@ -36,5 +37,5 @@ func rmPassword(cmd *cobra.Command, args []string) {
 		fmt.Println(e)
 		os.Exit(1)
 	}
-	gitAddFile(strings.TrimRight(passFile, "/"), fmt.Sprintf("Remove %s from store.", args[0]))
+	git.AddFile(strings.TrimRight(passFile, "/"), fmt.Sprintf("Remove %s from store.", args[0]))
 }

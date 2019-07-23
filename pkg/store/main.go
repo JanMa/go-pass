@@ -2,6 +2,7 @@ package store
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,10 +22,16 @@ type Store struct {
 // New returns a new Store
 func New(path string) (*Store, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, fmt.Errorf("Path %s does not exist\n", path)
+		return nil, fmt.Errorf("path %s does not exist", path)
+	}
+	rec, err := ParseGpgID(path + "/.gpg-id")
+	if err != nil {
+		return nil, err
 	}
 	return &Store{
-		Path: path,
+		Path:       path,
+		gpgID:      path + "/.gpg-id",
+		recipients: rec,
 	}, nil
 }
 
@@ -92,4 +99,34 @@ func (s *Store) DeleteEntry(e *entry.Entry) error {
 		err = fmt.Errorf("Could not delete entry")
 	}
 	return err
+}
+
+// FindGpgID traverses the store to find the next matching .gpg-id
+// file for a given path
+func (s *Store) FindGpgID(path string) string {
+	dirs := strings.Split(strings.Trim(path, "/"), "/")
+	root := strings.Split(strings.Trim(s.Path, "/"), "/")
+	if l := len(dirs); filepath.Ext(dirs[l-1]) == ".gpg" {
+		dirs = dirs[:(l - 1)]
+	}
+	for i := len(dirs); i >= len(root); i-- {
+		p := "/" + strings.Join(dirs[:i], "/") + "/.gpg-id"
+		if f, e := os.Stat(p); !os.IsNotExist(e) && !f.IsDir() {
+			return p
+		}
+	}
+	return s.Path + "/.gpg-id"
+}
+
+// ParseGpgID takes the path to a .gpg-id file and returns
+// it's entries
+func ParseGpgID(path string) ([]string, error) {
+	if _, e := os.Stat(path); os.IsNotExist(e) {
+		return nil, e
+	}
+	gpgID, e := ioutil.ReadFile(path)
+	if e != nil {
+		return nil, e
+	}
+	return strings.Split(strings.Trim(string(gpgID), "\n"), "\n"), nil
 }

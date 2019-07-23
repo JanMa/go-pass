@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"gitlab.com/JanMa/go-pass/pkg/git"
 	"gitlab.com/JanMa/go-pass/util"
 )
 
@@ -34,7 +35,7 @@ func editPassword(cmd *cobra.Command, args []string) {
 	os.MkdirAll(filepath.Dir(root), 0755)
 	exitOnError(gpg.Run())
 	exitOnError(os.Remove(tmpfile))
-	gitAddFile(root, fmt.Sprintf("Edit %s with %s", args[0], getEditor()))
+	git.AddFile(root, fmt.Sprintf("Edit %s with %s", args[0], getEditor()))
 }
 
 func getEditor() string {

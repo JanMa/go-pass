@@ -76,7 +76,7 @@ Optionally replace only the first line of an existing file with a new password.`
 		Short:              "If the password store is a git repository, execute a git command specified by git-command-args.",
 		Args:               cobra.ArbitraryArgs,
 		DisableFlagParsing: true,
-		Run:                git,
+		Run:                gitCommand,
 	}
 	// grepCmd represents the grep command
 	grepCmd = &cobra.Command{

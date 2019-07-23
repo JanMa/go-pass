@@ -11,6 +11,7 @@ import (
 	"github.com/atotto/clipboard"
 	qrcode "github.com/skip2/go-qrcode"
 	"github.com/spf13/cobra"
+	"gitlab.com/JanMa/go-pass/pkg/git"
 	"gitlab.com/JanMa/go-pass/util"
 )
 
@@ -72,7 +73,7 @@ func generatePassword(cmd *cobra.Command, args []string) {
 	if InPlace {
 		verb = "Replace"
 	}
-	gitAddFile(root, fmt.Sprintf("%s generated password for %s.", verb, args[0]))
+	git.AddFile(root, fmt.Sprintf("%s generated password for %s.", verb, args[0]))
 
 	if Clip {
 		exitOnError(clipboard.WriteAll(pass))

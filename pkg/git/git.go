@@ -8,6 +8,7 @@ import (
 	"gitlab.com/JanMa/go-pass/pkg/store"
 )
 
+// AddFile commits a given file or directory to the git repository
 func AddFile(path, msg string) (string, error) {
 	s, e := store.GetPasswordStore()
 	if f, e := os.Stat(s + "/.git"); os.IsNotExist(e) || !f.IsDir() {
@@ -29,6 +30,7 @@ func AddFile(path, msg string) (string, error) {
 	return string(o), e
 }
 
+// RunCommand runs the given git subcommand inside the git repository
 func RunCommand(args []string) (string, error) {
 	s, e := store.GetPasswordStore()
 	if f, e := os.Stat(s + "/.git"); os.IsNotExist(e) || !f.IsDir() {
