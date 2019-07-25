@@ -15,7 +15,6 @@ var (
 	NoSymbols   bool
 	OtpClip     bool
 	QRCode      int
-	RecurseRm   bool
 	Subdir      string
 	Version     string
 	Zsh         bool
@@ -29,8 +28,7 @@ func init() {
 	showCmd.Flags().Lookup("qrcode").NoOptDefVal = "1"
 
 	// rm flags
-	rmCmd.Flags().BoolVarP(&RecurseRm, "recursive", "r", false, "Delete recursively if it is a directory.")
-	rmCmd.Flags().BoolVarP(&ForceRm, "force", "f", false, "Forcefully remove password or directory.")
+	rmCmd.Flags().BoolVarP(&ForceRm, "force", "f", false, "Forcefully remove password(s).")
 
 	// mv flags
 	mvCmd.Flags().BoolVarP(&ForceMv, "force", "f", false, "Forcefully copy password or directory.")

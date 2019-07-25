@@ -143,9 +143,14 @@ overwriting existing password unless forced.`,
 	}
 	// rmCmd represents the rm command
 	rmCmd = &cobra.Command{
-		Use:                   "rm [--recursive,-r] [--force,-f] pass-name",
-		Args:                  cobra.ExactArgs(1),
-		Short:                 "Remove existing password or directory, optionally forcefully.",
+		Use:   "rm [--force,-f] pass-name",
+		Args:  cobra.ExactArgs(1),
+		Short: "Remove existing password, optionally forcefully.",
+		Long: `Remove existing password, optionally forcefully.
+Also accepts a regular expression and removes all matching entries from the
+password store.`,
+		Example: `go-pass rm SomePassword
+go-pass rm "Mail_.*/.*"`,
 		Run:                   rmPassword,
 		Aliases:               []string{"delete", "remove"},
 		DisableFlagsInUseLine: true,

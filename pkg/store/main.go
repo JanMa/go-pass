@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -82,6 +83,22 @@ func (s *Store) FindEntry(e string) (*entry.Entry, error) {
 	result = s.entries[e]
 	if result == nil {
 		err = fmt.Errorf("%s is not in the Store", e)
+	}
+	return result, err
+}
+
+// FindEntries searches for an entry inside the Store and returns it
+func (s *Store) FindEntries(e string) ([]*entry.Entry, error) {
+	result := []*entry.Entry{}
+	r := regexp.MustCompile(e + "$")
+	var err error
+	for k := range s.entries {
+		if r.MatchString(k) {
+			result = append(result, s.entries[k])
+		}
+	}
+	if len(result) == 0 {
+		err = fmt.Errorf("Found no matching entires for %s", e)
 	}
 	return result, err
 }
