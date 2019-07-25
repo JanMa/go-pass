@@ -63,8 +63,8 @@ var (
 		Use:   "find pass-names",
 		Short: "List passwords that match pass-names",
 		Long: `List passwords that match the given pass-names.
-Also accepts a regular expression.`,
-		Example: `go-pass find SomePassword
+Accepts a regular expression.`,
+		Example: `go-pass find ".*SomePassword"
 go-pass find "Mail_.*/.*"`,
 		Args:                  cobra.ExactArgs(1),
 		Run:                   findPasswords,
@@ -147,14 +147,10 @@ overwriting existing password unless forced.`,
 	}
 	// rmCmd represents the rm command
 	rmCmd = &cobra.Command{
-		Use:   "rm [--force,-f] pass-name",
-		Args:  cobra.ExactArgs(1),
-		Short: "Remove existing password, optionally forcefully.",
-		Long: `Remove existing password, optionally forcefully.
-Also accepts a regular expression and removes all matching entries from the
-password store.`,
-		Example: `go-pass rm SomePassword
-go-pass rm "Mail_.*/.*"`,
+		Use:                   "rm [--force,-f] pass-name",
+		Args:                  cobra.ExactArgs(1),
+		Short:                 "Remove existing password or directory, optionally forcefully.",
+		Example:               `go-pass rm SomePassword`,
 		Run:                   rmPassword,
 		Aliases:               []string{"delete", "remove"},
 		DisableFlagsInUseLine: true,

@@ -90,7 +90,7 @@ func (s *Store) FindEntry(e string) (*entry.Entry, error) {
 // FindEntries searches for an entry inside the Store and returns it
 func (s *Store) FindEntries(e string) ([]*entry.Entry, error) {
 	result := []*entry.Entry{}
-	r := regexp.MustCompile(e + "$")
+	r := regexp.MustCompile("^" + e + "$")
 	var err error
 	for k := range s.entries {
 		if r.MatchString(k) {

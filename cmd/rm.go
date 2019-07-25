@@ -10,8 +10,16 @@ import (
 )
 
 func rmPassword(cmd *cobra.Command, args []string) {
-	result, err := PasswordStore.FindEntries(args[0])
-	exitOnError(err)
+	pattern := args[0]
+	dir, err := os.Stat(PasswordStore.Path + "/" + args[0])
+	if !os.IsNotExist(err) && dir.IsDir() {
+		pattern = args[0] + "/.*"
+	}
+	result, err := PasswordStore.FindEntries(pattern)
+	if err != nil {
+		fmt.Println("found no matching entries for", args[0])
+		os.Exit(1)
+	}
 	fmt.Println("The following entries will be deleted:")
 	for _, entry := range result {
 		fmt.Println("-", entry.Name)
