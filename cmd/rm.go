@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -11,8 +12,9 @@ import (
 
 func rmPassword(cmd *cobra.Command, args []string) {
 	pattern := args[0]
-	dir, err := os.Stat(PasswordStore.Path + "/" + args[0])
-	if !os.IsNotExist(err) && dir.IsDir() {
+	dir := PasswordStore.Path + "/" + args[0]
+	stat, err := os.Stat(dir)
+	if !os.IsNotExist(err) && stat.IsDir() {
 		pattern = args[0] + "/.*"
 	}
 	result, err := PasswordStore.FindEntries(pattern)
@@ -34,4 +36,26 @@ func rmPassword(cmd *cobra.Command, args []string) {
 		exitOnError(err)
 		git.AddFile(entry.Path, fmt.Sprintf("Remove %s from store.", entry.Name))
 	}
+
+	// Ensure empty directory gets deleted
+	if empty, _ := isEmpty(dir); empty {
+		fmt.Println("Remove:", dir)
+		err = os.RemoveAll(dir)
+		git.AddFile(dir, fmt.Sprintf("Remove %s from store.", args[0]))
+	}
+}
+
+// https://stackoverflow.com/a/30708914
+func isEmpty(name string) (bool, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1) // Or f.Readdir(1)
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err // Either not empty or error, suits both cases
 }
