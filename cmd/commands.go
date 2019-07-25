@@ -60,9 +60,13 @@ var (
 	}
 	// findCmd represents the find command
 	findCmd = &cobra.Command{
-		Use:                   "find pass-names...",
-		Short:                 "List passwords that match pass-names",
-		Args:                  cobra.MinimumNArgs(1),
+		Use:   "find pass-names",
+		Short: "List passwords that match pass-names",
+		Long: `List passwords that match the given pass-names.
+Also accepts a regular expression.`,
+		Example: `go-pass find SomePassword
+go-pass find "Mail_.*/.*"`,
+		Args:                  cobra.ExactArgs(1),
 		Run:                   findPasswords,
 		Aliases:               []string{"search"},
 		DisableFlagsInUseLine: true,
