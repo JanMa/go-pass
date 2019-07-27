@@ -18,11 +18,12 @@ func gitCommand(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 	run := exec.Command("git", "-C", root)
-	for _, a := range args {
-		run.Args = append(run.Args, a)
-	}
-	o, _ := run.CombinedOutput()
-	fmt.Print(string(o))
+	run.Args = append(run.Args, args...)
+	run.Stdin = os.Stdin
+	run.Stdout = os.Stdout
+	run.Stderr = os.Stderr
+	exitOnError(run.Start())
+	exitOnError(run.Wait())
 	if args[0] == "init" {
 		git.AddFile(root, "Add current contents of password store.")
 		attr := root + "/.gitattributes"
