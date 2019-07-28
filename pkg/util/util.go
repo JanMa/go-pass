@@ -1,14 +1,34 @@
 package util
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"os"
 	"os/exec"
 	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"golang.org/x/crypto/ssh/terminal"
+)
+
+const (
+	// LowerLetters is the list of lowercase letters.
+	LowerLetters = "abcdefghijklmnopqrstuvwxyz"
+
+	// UpperLetters is the list of uppercase letters.
+	UpperLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+	// Digits is the list of permitted digits.
+	Digits = "0123456789"
+
+	// Symbols is the list of symbols.
+	Symbols = "~!@#$%^&*()_+`-={}|[]\\:\"<>?,./"
+
+	// CharacterSet set containing all types of characters
+	CharacterSet = LowerLetters + UpperLetters + Digits + Symbols
+	// CharacterSetNoSymbols set containing only letters and digits
+	CharacterSetNoSymbols = LowerLetters + UpperLetters + Digits
 )
 
 // PrintLine prints a line of output
@@ -71,19 +91,27 @@ func YesNo(msg string) bool {
 	return false
 }
 
-// RandomString returns a random string of [a-zA-Z0-1] of the given length
-func RandomString(n int) string {
-	var letter = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+// RandomString returns a random string of of the given length
+func RandomString(n int, symbols bool) (string, error) {
+	letter := []rune(CharacterSet)
+	if !symbols {
+		letter = []rune(CharacterSetNoSymbols)
+	}
 
 	b := make([]rune, n)
-	for i := range b {
-		b[i] = letter[rand.Intn(len(letter))]
+	for i := 0; i < n; i++ {
+		c, err := rand.Int(rand.Reader, big.NewInt(int64(len(letter))))
+		if err != nil {
+			return "", err
+		}
+		b[i] = letter[c.Int64()]
 	}
-	return string(b)
+	return string(b), nil
 }
 
 // TmpFile generates the path to a new temporary file
-func TmpFile() string {
+func TmpFile() (string, error) {
 	os.Mkdir(os.TempDir()+"/go-pass", 0700)
-	return os.TempDir() + "/go-pass/" + RandomString(8)
+	r, e := RandomString(8, false)
+	return os.TempDir() + "/go-pass/" + r, e
 }
