@@ -147,3 +147,12 @@ func ParseGpgID(path string) ([]string, error) {
 	}
 	return strings.Split(strings.Trim(string(gpgID), "\n"), "\n"), nil
 }
+
+// ShowAll returns an array of all entries in the store
+func (s *Store) ShowAll() []*entry.Entry {
+	r := []*entry.Entry{}
+	for _, e := range s.entries {
+		r = append(r, e)
+	}
+	return r
+}

@@ -93,9 +93,13 @@ Optionally replace only the first line of an existing file with a new password.`
 	}
 	// grepCmd represents the grep command
 	grepCmd = &cobra.Command{
-		Use:                   "grep [GREPOPTIONS] search-string",
-		Args:                  cobra.MinimumNArgs(1),
-		Short:                 "Search for password files containing search-string when decrypted.",
+		Use:   "grep search-string",
+		Args:  cobra.ExactArgs(1),
+		Short: "Search for password files containing search-string when decrypted.",
+		Long: `Search for password files containing search-sting when decrypted.
+Accepts a regular expression.`,
+		Example: `go-pass grep "User: MyUser"
+go-pass grep ".*my.email@example.com"`,
 		Run:                   grepPasswords,
 		DisableFlagsInUseLine: true,
 	}

@@ -29,6 +29,11 @@ const (
 	CharacterSet = LowerLetters + UpperLetters + Digits + Symbols
 	// CharacterSetNoSymbols set containing only letters and digits
 	CharacterSetNoSymbols = LowerLetters + UpperLetters + Digits
+
+	// BoldBlue print text in bold blue
+	BoldBlue = "\033[1m\033[34m"
+	// Reset reset text formating
+	Reset = "\033[0m"
 )
 
 // PrintLine prints a line of output
