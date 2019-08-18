@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -102,6 +103,17 @@ func (s *Store) FindEntries(e string) (map[string]*entry.Entry, error) {
 		err = fmt.Errorf("Found no matching entires for %s", e)
 	}
 	return m, err
+}
+
+// SortEntries returns a sorted array of entry names
+// for a given map of entries
+func SortEntries(entries map[string]*entry.Entry) []string {
+	names := []string{}
+	for e := range entries {
+		names = append(names, e)
+	}
+	sort.Strings(names)
+	return names
 }
 
 // InsertEntry adds a new entry.Entry to the Store
