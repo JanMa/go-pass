@@ -114,3 +114,13 @@ func isEmpty(name string) (bool, error) {
 	}
 	return false, err // Either not empty or error, suits both cases
 }
+
+// GetKeys returns a string containing all current gpg keys
+// used to encrypt the Entry
+func (e *Entry) GetKeys() (string, error) {
+	if _, e := os.Stat(e.Path); os.IsNotExist(e) {
+		return "", fmt.Errorf("Entry not encrypted")
+	}
+	k, err := exec.Command("gpg", "-v", "-d", "--list-only", "--keyid-format", "long", e.Path).CombinedOutput()
+	return string(k), err
+}
