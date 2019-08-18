@@ -3,21 +3,17 @@ package cmd
 import (
 	"fmt"
 	"regexp"
-	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"gitlab.com/JanMa/go-pass/pkg/store"
 	"gitlab.com/JanMa/go-pass/pkg/util"
 )
 
 func grepPasswords(cmd *cobra.Command, args []string) {
 	r := regexp.MustCompile(args[0])
 	all := PasswordStore.ShowAll()
-	names := []string{}
-	for n := range all {
-		names = append(names, n)
-	}
-	sort.Strings(names)
+	names := store.SortEntries(all)
 	for _, n := range names {
 		err := all[n].Decrypt()
 		exitOnError(err)

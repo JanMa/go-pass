@@ -4,13 +4,16 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"gitlab.com/JanMa/go-pass/pkg/store"
+	"gitlab.com/JanMa/go-pass/pkg/util"
 )
 
 func findPasswords(cmd *cobra.Command, args []string) {
-	result, err := PasswordStore.FindEntries(args[0])
+	entries, err := PasswordStore.FindEntries(args[0])
 	exitOnError(err)
-	fmt.Println("Results:")
-	for _, entry := range result {
-		fmt.Println(entry.Name)
+	names := store.SortEntries(entries)
+	fmt.Printf(util.BoldBlue + "Results:\n" + util.Reset)
+	for _, n := range names {
+		fmt.Println(n)
 	}
 }

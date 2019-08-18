@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/pkg/git"
+	"gitlab.com/JanMa/go-pass/pkg/store"
 	"gitlab.com/JanMa/go-pass/pkg/util"
 )
 
@@ -18,13 +19,11 @@ func rmPassword(cmd *cobra.Command, args []string) {
 		pattern = args[0] + "/.*"
 	}
 	result, err := PasswordStore.FindEntries(pattern)
-	if err != nil {
-		fmt.Println("found no matching entries for", args[0])
-		os.Exit(1)
-	}
+	exitOnError(err)
+	names := store.SortEntries(result)
 	fmt.Println("The following entries will be deleted:")
-	for _, entry := range result {
-		fmt.Println("-", entry.Name)
+	for _, n := range names {
+		fmt.Println("-", n)
 	}
 	fmt.Println()
 	if !ForceRm && !util.YesNo(fmt.Sprintf("Are you sure you would like to delete them?")) {
