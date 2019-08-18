@@ -87,20 +87,21 @@ func (s *Store) FindEntry(e string) (*entry.Entry, error) {
 	return result, err
 }
 
-// FindEntries searches for an entry inside the Store and returns it
-func (s *Store) FindEntries(e string) ([]*entry.Entry, error) {
-	result := []*entry.Entry{}
+// FindEntries searches for entries inside the Store and returns
+// a map containing the results
+func (s *Store) FindEntries(e string) (map[string]*entry.Entry, error) {
+	m := make(map[string]*entry.Entry)
 	r := regexp.MustCompile("^" + e + "$")
 	var err error
 	for k := range s.entries {
 		if r.MatchString(k) {
-			result = append(result, s.entries[k])
+			m[k] = s.entries[k]
 		}
 	}
-	if len(result) == 0 {
+	if len(m) == 0 {
 		err = fmt.Errorf("Found no matching entires for %s", e)
 	}
-	return result, err
+	return m, err
 }
 
 // InsertEntry adds a new entry.Entry to the Store
