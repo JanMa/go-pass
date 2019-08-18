@@ -213,21 +213,11 @@ func Execute() {
 func init() {
 	var err error
 	p, err := store.GetPasswordStore()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	exitOnError(err)
 	PasswordStore, err = store.New(p)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
+	exitOnError(err)
 	err = PasswordStore.Fill()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	exitOnError(err)
 
 	rootCmd.AddCommand(cpCmd)
 	rootCmd.AddCommand(editCmd)

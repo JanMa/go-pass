@@ -26,10 +26,7 @@ func New(path string) (*Store, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return nil, fmt.Errorf("path %s does not exist", path)
 	}
-	rec, err := ParseGpgID(path + "/.gpg-id")
-	if err != nil {
-		return nil, err
-	}
+	rec, _ := ParseGpgID(path + "/.gpg-id")
 	return &Store{
 		Path:       path,
 		gpgID:      path + "/.gpg-id",
@@ -152,7 +149,7 @@ func (s *Store) FindGpgID(path string) string {
 // it's entries
 func ParseGpgID(path string) ([]string, error) {
 	if _, e := os.Stat(path); os.IsNotExist(e) {
-		return nil, e
+		return nil, fmt.Errorf("%s does not exist", path)
 	}
 	gpgID, e := ioutil.ReadFile(path)
 	if e != nil {
