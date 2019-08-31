@@ -31,15 +31,23 @@ func AddFile(path, msg string) (string, error) {
 }
 
 // RunCommand runs the given git subcommand inside the git repository
-func RunCommand(args []string) (string, error) {
+func RunCommand(args []string) error {
 	s, e := store.GetPasswordStore()
-	if f, e := os.Stat(s + "/.git"); os.IsNotExist(e) || !f.IsDir() {
-		return "", fmt.Errorf("Password-store is not a git repository")
+	if f, e := os.Stat(s + "/.git"); args[0] != "init" && (os.IsNotExist(e) || !f.IsDir()) {
+		return fmt.Errorf("Password-store is not a git repository")
 	}
 	git := exec.Command("git", "-C", s)
-	for _, a := range args {
-		git.Args = append(git.Args, a)
+	git.Args = append(git.Args, args...)
+	git.Stdin = os.Stdin
+	git.Stdout = os.Stdout
+	git.Stderr = os.Stderr
+	e = git.Start()
+	if e != nil {
+		return e
 	}
-	o, e := git.CombinedOutput()
-	return string(o), e
+	e = git.Wait()
+	if e != nil {
+		return e
+	}
+	return nil
 }
