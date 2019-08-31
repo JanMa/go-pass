@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
+	// "strings"
 )
 
 // Entry represents an entry inside the password store
@@ -34,7 +34,7 @@ func (e *Entry) Decrypt() error {
 // Encrypt writes encrypted entry to disk
 func (e *Entry) Encrypt(recipients []string) error {
 	gpg := exec.Command("gpg",
-		"-e", "-o", strings.ReplaceAll(e.Path, " ", `\ `),
+		"-e", "-o", e.Path,
 		"--quiet", "--yes", "--compress-algo=none", "--no-encrypt-to")
 	for _, r := range recipients {
 		gpg.Args = append(gpg.Args, "-r")
@@ -49,7 +49,10 @@ func (e *Entry) Encrypt(recipients []string) error {
 		io.WriteString(stdin, e.value)
 	}()
 	os.MkdirAll(filepath.Dir(e.Path), 0755)
-	err = gpg.Run()
+	out, err := gpg.CombinedOutput()
+	if err != nil {
+		fmt.Println(string(out))
+	}
 	return err
 }
 

@@ -2,21 +2,20 @@ package cmd
 
 import (
 	"fmt"
-	"io"
+	"io/ioutil"
 	"os"
-	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/pkg/git"
-	"gitlab.com/JanMa/go-pass/pkg/util"
+	"gitlab.com/JanMa/go-pass/pkg/store"
 )
 
 func initPasswordStore(cmd *cobra.Command, args []string) {
-	gpgKeys := getKeys(args)
-	root := util.GetPasswordStore()
+	gpgKeys, err := store.GetGpgKeys(args)
+	exitOnError(err)
+	root := PasswordStore.Path
 	if len(Subdir) > 0 {
 		root += "/" + strings.TrimRight(Subdir, "/")
 	}
@@ -24,78 +23,47 @@ func initPasswordStore(cmd *cobra.Command, args []string) {
 	if _, e := os.Stat(gpgID); os.IsExist(e) {
 		exitOnError(os.Remove(gpgID))
 	}
-	f, e := os.Create(gpgID)
-	defer f.Close()
-	exitOnError(e)
-	f.Write([]byte(strings.Join(args, "\n") + "\n"))
-	fmt.Printf("Password store initialized for %s\n", strings.Trim(strings.Join(args, ", "), "\n"))
-	git.AddFile(gpgID, fmt.Sprintf("Set GPG id to %s.", strings.Trim(strings.Join(args, ", "), "\n")))
-	reEncryptDir(root, gpgKeys)
-	git.AddFile(root, fmt.Sprintf("Reencrypt password store using new GPG id %s.", strings.Trim(strings.Join(args, ", "), "\n")))
+	exitOnError(ioutil.WriteFile(gpgID, []byte(strings.Join(args, "\n")+"\n"), 0644))
+	fmt.Printf("Password store initialized for %s\n",
+		strings.Trim(strings.Join(args, ", "), "\n"))
+	git.AddFile(gpgID, fmt.Sprintf("Set GPG id to %s.",
+		strings.Trim(strings.Join(args, ", "), "\n")))
+	if len(Subdir) > 0 {
+		exitOnError(reEncryptEntries(Subdir+"/", gpgKeys))
+	} else {
+		exitOnError(reEncryptEntries("", gpgKeys))
+	}
+	git.AddFile(root, fmt.Sprintf("Reencrypt password store using new GPG id %s.",
+		strings.Trim(strings.Join(args, ", "), "\n")))
 }
 
-func getKeys(recipients []string) []string {
-	re := regexp.MustCompile(`sub:[^:]*:[^:]*:[^:]*:([^:]*):[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[a-zA-Z]*e[a-zA-Z]*:.*`)
-	gpg := exec.Command("gpg", "--list-keys", "--with-colons")
-	for _, r := range recipients {
-		gpg.Args = append(gpg.Args, r)
+func reEncryptEntries(path string, keys []string) error {
+	if len(PasswordStore.ShowAll()) == 0 {
+		return nil
 	}
-	k, e := gpg.Output()
-	exitOnError(e)
-	match := re.FindAllSubmatch(k, -1)
-
-	gpgKeys := []string{}
-	for _, m := range match {
-		gpgKeys = append(gpgKeys, string(m[1]))
+	entries, err := PasswordStore.FindEntries(path + ".*")
+	names := store.SortEntries(entries)
+	if err != nil {
+		return err
 	}
-
-	return gpgKeys
-}
-
-func reEncryptFile(path string, keys []string) {
-	currentKeys, _ := exec.Command("gpg", "-v", "-d", "--list-only", "--keyid-format", "long", path).CombinedOutput()
-	if !matchKeys(string(currentKeys), keys) {
-		fmt.Printf("%s: reencrypting to %s\n", filepath.Base(path), strings.Join(keys, ", "))
-		pass := util.RunCommand("gpg", "-dq", path)
-		exitOnError(os.Remove(path))
-		gpg := exec.Command("gpg2",
-			"-e", "-o", path,
-			"--quiet", "--yes", "--compress-algo=none", "--no-encrypt-to")
-		for _, r := range keys {
-			gpg.Args = append(gpg.Args, "-r")
-			gpg.Args = append(gpg.Args, r)
-		}
-		stdin, err := gpg.StdinPipe()
-		exitOnError(err)
-		go func() {
-			defer stdin.Close()
-			io.WriteString(stdin, strings.Join(pass, "\n"))
-		}()
-		os.MkdirAll(filepath.Dir(path), 0755)
-		if o, err := gpg.CombinedOutput(); err != nil {
-			fmt.Println(string(o))
-			os.Exit(1)
-		}
-	}
-}
-
-func reEncryptDir(path string, keys []string) {
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+	for _, n := range names {
+		curKeys, err := entries[n].GetKeys()
 		if err != nil {
 			return err
 		}
-		if info.IsDir() && info.Name() == ".git" {
-			return filepath.SkipDir
+		if !matchKeys(curKeys, keys) {
+			err := entries[n].Decrypt()
+			if err != nil {
+				return err
+			}
+			fmt.Println("reencrypting", n)
+			err = entries[n].Encrypt(keys)
+			if err != nil {
+				return err
+			}
 		}
-		if filepath.Ext(path) == ".gpg" {
-			reEncryptFile(path, keys)
-		}
-		return nil
-	})
-	if err != nil {
-		fmt.Println(err)
-		return
 	}
+	return nil
 }
 
 func matchKeys(input string, keys []string) bool {

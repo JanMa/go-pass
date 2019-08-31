@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -161,4 +162,25 @@ func ParseGpgID(path string) ([]string, error) {
 // ShowAll returns a map of all entries in the store
 func (s *Store) ShowAll() map[string]*entry.Entry {
 	return s.entries
+}
+
+//GetGpgKeys returns the gpg keys of an array of recipients
+func GetGpgKeys(recipients []string) ([]string, error) {
+	re := regexp.MustCompile(`sub:[^:]*:[^:]*:[^:]*:([^:]*):[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[a-zA-Z]*e[a-zA-Z]*:.*`)
+	gpg := exec.Command("gpg", "--list-keys", "--with-colons")
+	for _, r := range recipients {
+		gpg.Args = append(gpg.Args, r)
+	}
+	k, e := gpg.Output()
+	if e != nil {
+		return nil, e
+	}
+	match := re.FindAllSubmatch(k, -1)
+
+	gpgKeys := []string{}
+	for _, m := range match {
+		gpgKeys = append(gpgKeys, string(m[1]))
+	}
+
+	return gpgKeys, nil
 }
