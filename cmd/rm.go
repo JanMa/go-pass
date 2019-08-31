@@ -2,39 +2,59 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
-	"gitlab.com/JanMa/go-pass/util"
+	"gitlab.com/JanMa/go-pass/pkg/git"
+	"gitlab.com/JanMa/go-pass/pkg/store"
+	"gitlab.com/JanMa/go-pass/pkg/util"
 )
 
 func rmPassword(cmd *cobra.Command, args []string) {
-	passDir := util.GetPasswordStore() + "/" + args[0]
-	passFile := passDir + ".gpg"
-	_, eF := os.Stat(passFile)
-	fD, eD := os.Stat(passDir)
-	if !os.IsNotExist(eF) && !os.IsNotExist(eD) && fD.IsDir() && args[0][len(args[0])-1] == '/' || os.IsNotExist(eF) {
-		passFile = strings.TrimRight(passDir, "/")
+	pattern := args[0]
+	dir := PasswordStore.Path + "/" + args[0]
+	stat, err := os.Stat(dir)
+	if !os.IsNotExist(err) && stat.IsDir() {
+		pattern = args[0] + "/.*"
 	}
-
-	if _, e := os.Stat(passFile); os.IsNotExist(e) {
-		fmt.Printf("Error: %s is not in the password store.\n", args[0])
+	result, err := PasswordStore.FindEntries(pattern)
+	exitOnError(err)
+	names := store.SortEntries(result)
+	fmt.Println("The following entries will be deleted:")
+	for _, n := range names {
+		fmt.Println("-", n)
+	}
+	fmt.Println()
+	if !ForceRm && !util.YesNo(fmt.Sprintf("Are you sure you would like to delete them?")) {
 		os.Exit(1)
 	}
 
-	if !ForceRm && !util.YesNo(fmt.Sprintf("Are you sure you would like to delete %s?", args[0])) {
-		os.Exit(1)
+	for _, entry := range result {
+		err = entry.Delete()
+		exitOnError(err)
+		git.AddFile(entry.Path, fmt.Sprintf("Remove %s from store.", entry.Name))
 	}
 
-	if e := func(p string, r bool) error {
-		if r {
-			return os.RemoveAll(p)
-		}
-		return os.Remove(p)
-	}(passFile, RecurseRm); e != nil {
-		fmt.Println(e)
-		os.Exit(1)
+	// Ensure empty directory gets deleted
+	if empty, _ := isEmpty(dir); empty {
+		fmt.Println("Remove:", dir)
+		err = os.RemoveAll(dir)
+		git.AddFile(dir, fmt.Sprintf("Remove %s from store.", args[0]))
 	}
-	gitAddFile(strings.TrimRight(passFile, "/"), fmt.Sprintf("Remove %s from store.", args[0]))
+}
+
+// https://stackoverflow.com/a/30708914
+func isEmpty(name string) (bool, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1) // Or f.Readdir(1)
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err // Either not empty or error, suits both cases
 }

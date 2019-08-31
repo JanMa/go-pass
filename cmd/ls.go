@@ -2,21 +2,22 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
-	"gitlab.com/JanMa/go-pass/util"
+	"gitlab.com/JanMa/go-pass/pkg/store"
+	"gitlab.com/JanMa/go-pass/pkg/util"
 )
 
 func listPasswords(cmd *cobra.Command, args []string) {
-	root := util.GetPasswordStore()
 	path := "Password Store"
+	all := PasswordStore.ShowAll()
 	if len(args) > 0 {
 		path = args[0]
-		root += "/" + path
+		all, _ = PasswordStore.FindEntries(args[0] + ".*")
 	}
-	// TODO: don't use external program
-	lines := util.RunCommand("tree", "-C", "-l", root, "-P", "*.gpg", "--noreport")
-	fmt.Println(path)
-	for i := 1; i < len(lines); i++ {
-		util.PrintLine(lines[i])
+	names := store.SortEntries(all)
+	fmt.Printf(util.BoldBlue+"%s:\n"+util.Reset, path)
+	for _, n := range names {
+		fmt.Println(n)
 	}
 }
