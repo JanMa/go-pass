@@ -7,16 +7,25 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"gitlab.com/JanMa/go-pass/pkg/git"
+	"gitlab.com/JanMa/go-pass/pkg/store"
 )
 
 var (
+	// PasswordStore the global password store
+	PasswordStore *store.Store
+
 	// rootCmd represents the base command when called without any subcommands
 	rootCmd = &cobra.Command{
 		Use:   "go-pass [subfolder | command]",
 		Short: "go-pass is a pass clone written in Go",
 		Args:  cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			showPassword(cmd, args)
+			if len(args) > 0 {
+				showPassword(cmd, args)
+			} else {
+				listPasswords(cmd, args)
+			}
 		},
 		Example:                "",
 		BashCompletionFunction: bash_completion_func,
@@ -51,9 +60,13 @@ var (
 	}
 	// findCmd represents the find command
 	findCmd = &cobra.Command{
-		Use:                   "find pass-names...",
-		Short:                 "List passwords that match pass-names",
-		Args:                  cobra.MinimumNArgs(1),
+		Use:   "find pass-names",
+		Short: "List passwords that match pass-names",
+		Long: `List passwords that match the given pass-names.
+Accepts a regular expression.`,
+		Example: `go-pass find ".*SomePassword"
+go-pass find "Mail_.*/.*"`,
+		Args:                  cobra.ExactArgs(1),
 		Run:                   findPasswords,
 		Aliases:               []string{"search"},
 		DisableFlagsInUseLine: true,
@@ -76,13 +89,17 @@ Optionally replace only the first line of an existing file with a new password.`
 		Short:              "If the password store is a git repository, execute a git command specified by git-command-args.",
 		Args:               cobra.ArbitraryArgs,
 		DisableFlagParsing: true,
-		Run:                git,
+		Run:                gitCommand,
 	}
 	// grepCmd represents the grep command
 	grepCmd = &cobra.Command{
-		Use:                   "grep [GREPOPTIONS] search-string",
-		Args:                  cobra.MinimumNArgs(1),
-		Short:                 "Search for password files containing search-string when decrypted.",
+		Use:   "grep search-string",
+		Args:  cobra.ExactArgs(1),
+		Short: "Search for password files containing search-string when decrypted.",
+		Long: `Search for password files containing search-sting when decrypted.
+Accepts a regular expression.`,
+		Example: `go-pass grep "User: MyUser"
+go-pass grep ".*my.email@example.com"`,
 		Run:                   grepPasswords,
 		DisableFlagsInUseLine: true,
 	}
@@ -126,7 +143,7 @@ overwriting existing password unless forced.`,
 			s, _ := copyPasswords(args[0], args[1], ForceMv)
 			if len(s) > 0 {
 				os.RemoveAll(s)
-				gitAddFile(strings.TrimRight(s, "/"), fmt.Sprintf("Remove %s from store.", args[0]))
+				git.AddFile(strings.TrimRight(s, "/"), fmt.Sprintf("Remove %s from store.", args[0]))
 			}
 		},
 		Aliases:               []string{"rename"},
@@ -134,9 +151,10 @@ overwriting existing password unless forced.`,
 	}
 	// rmCmd represents the rm command
 	rmCmd = &cobra.Command{
-		Use:                   "rm [--recursive,-r] [--force,-f] pass-name",
+		Use:                   "rm [--force,-f] pass-name",
 		Args:                  cobra.ExactArgs(1),
 		Short:                 "Remove existing password or directory, optionally forcefully.",
+		Example:               `go-pass rm SomePassword`,
 		Run:                   rmPassword,
 		Aliases:               []string{"delete", "remove"},
 		DisableFlagsInUseLine: true,
@@ -145,7 +163,7 @@ overwriting existing password unless forced.`,
 	showCmd = &cobra.Command{
 		Use:                   "show [--clip[=line-number],-c[=line-number]] [--qrcode[=line-number],-q[=line-number]] [pass-name]",
 		Short:                 "Show existing password and optionally put it on the clipboard.",
-		Args:                  cobra.MaximumNArgs(1),
+		Args:                  cobra.ExactArgs(1),
 		Run:                   showPassword,
 		Aliases:               []string{"ls", "list"},
 		DisableFlagsInUseLine: true,
@@ -176,6 +194,14 @@ $ autoload -U compinit && compinit
 			}
 		},
 	}
+
+	//otpCmd represents the otp command
+	otpCmd = &cobra.Command{
+		Use:   "otp",
+		Short: "Generate OTP code",
+		Args:  cobra.ExactArgs(1),
+		Run:   genOtpCode,
+	}
 )
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -185,6 +211,14 @@ func Execute() {
 }
 
 func init() {
+	var err error
+	p, err := store.GetPasswordStore()
+	exitOnError(err)
+	PasswordStore, err = store.New(p)
+	exitOnError(err)
+	err = PasswordStore.Fill()
+	exitOnError(err)
+
 	rootCmd.AddCommand(cpCmd)
 	rootCmd.AddCommand(editCmd)
 	rootCmd.AddCommand(findCmd)
@@ -199,4 +233,5 @@ func init() {
 	rootCmd.AddCommand(showCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(completionCmd)
+	rootCmd.AddCommand(otpCmd)
 }

@@ -9,6 +9,7 @@ Usage:
   go-pass [command]
 
 Available Commands:
+  completion  Generates completion scripts
   cp          Copies old-path to new-path, optionally forcefully, selectively reencrypting.
   edit        Insert a new password or edit an existing password using $EDITOR.
   find        List passwords that match pass-names
@@ -20,6 +21,7 @@ Available Commands:
   insert      Insert new password.
   ls          List passwords.
   mv          Renames or moves old-path to new-path, optionally forcefully, selectively reencrypting.
+  otp         Generate OTP code
   rm          Remove existing password or directory, optionally forcefully.
   show        Show existing password and optionally put it on the clipboard.
   version     Show version information
