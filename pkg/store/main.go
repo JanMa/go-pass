@@ -149,9 +149,6 @@ func (s *Store) FindGpgID(path string) string {
 // ParseGpgID takes the path to a .gpg-id file and returns
 // it's entries
 func ParseGpgID(path string) ([]string, error) {
-	if _, e := os.Stat(path); os.IsNotExist(e) {
-		return nil, fmt.Errorf("%s does not exist", path)
-	}
 	gpgID, e := ioutil.ReadFile(path)
 	if e != nil {
 		return nil, e

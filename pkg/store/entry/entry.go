@@ -16,6 +16,10 @@ type Entry struct {
 	value string
 }
 
+var (
+	testRunning = false
+)
+
 // Decrypt reads encrypted entry from disk
 func (e *Entry) Decrypt() error {
 	if _, err := os.Stat(e.Path); os.IsNotExist(err) {
@@ -39,6 +43,11 @@ func (e *Entry) Encrypt(recipients []string) error {
 	for _, r := range recipients {
 		gpg.Args = append(gpg.Args, "-r")
 		gpg.Args = append(gpg.Args, r)
+	}
+	// We need to trust all keys when running in test mode.
+	// This is rather ugly but there is no way around it.
+	if testRunning {
+		gpg.Args = append(gpg.Args, "--trust-model", "always")
 	}
 	stdin, err := gpg.StdinPipe()
 	if err != nil {
