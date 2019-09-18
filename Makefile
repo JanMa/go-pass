@@ -14,5 +14,10 @@ vendor:	get
 install:
 		GO111MODULE=on CGO_ENABLED=0 go install -mod=vendor  ${BUILDFLAGS}
 
+test:
+		go test ./...
+
+cover:
+		go test -cover ./...
 clean:
 		@rm -rf go-pass
