@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
-	// "strings"
+
+	"gitlab.com/JanMa/go-pass/pkg/gpg"
 )
 
 // Entry represents an entry inside the password store
@@ -25,44 +25,17 @@ func (e *Entry) Decrypt() error {
 	if _, err := os.Stat(e.Path); os.IsNotExist(err) {
 		return fmt.Errorf("%s is not in the password store", e.Name)
 	}
-	d, err := exec.Command("gpg", "-dq", e.Path).CombinedOutput()
+	d, err := gpg.Decrypt(e.Path)
 	if err != nil {
-		return fmt.Errorf(string(d))
+		return fmt.Errorf(d)
 	}
-	if len(d) > 0 && err == nil {
-		e.value = string(d)
-	}
+	e.value = d
 	return err
 }
 
 // Encrypt writes encrypted entry to disk
 func (e *Entry) Encrypt(recipients []string) error {
-	gpg := exec.Command("gpg",
-		"-e", "-o", e.Path,
-		"--quiet", "--yes", "--compress-algo=none", "--no-encrypt-to")
-	for _, r := range recipients {
-		gpg.Args = append(gpg.Args, "-r")
-		gpg.Args = append(gpg.Args, r)
-	}
-	// We need to trust all keys when running in test mode.
-	// This is rather ugly but there is no way around it.
-	if testRunning {
-		gpg.Args = append(gpg.Args, "--trust-model", "always")
-	}
-	stdin, err := gpg.StdinPipe()
-	if err != nil {
-		return err
-	}
-	go func() {
-		defer stdin.Close()
-		io.WriteString(stdin, e.value)
-	}()
-	os.MkdirAll(filepath.Dir(e.Path), 0755)
-	out, err := gpg.CombinedOutput()
-	if err != nil {
-		fmt.Println(string(out))
-	}
-	return err
+	return gpg.Encrypt(e.Path, e.value, recipients, testRunning)
 }
 
 // Show prints the entry value
@@ -125,14 +98,4 @@ func isEmpty(name string) (bool, error) {
 		return true, nil
 	}
 	return false, err // Either not empty or error, suits both cases
-}
-
-// GetKeys returns a string containing all current gpg keys
-// used to encrypt the Entry
-func (e *Entry) GetKeys() (string, error) {
-	if _, e := os.Stat(e.Path); os.IsNotExist(e) {
-		return "", fmt.Errorf("Entry not encrypted")
-	}
-	k, err := exec.Command("gpg", "-v", "-d", "--list-only", "--keyid-format", "long", e.Path).CombinedOutput()
-	return string(k), err
 }

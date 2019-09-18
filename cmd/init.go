@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/pkg/git"
+	"gitlab.com/JanMa/go-pass/pkg/gpg"
 	"gitlab.com/JanMa/go-pass/pkg/store"
 )
 
@@ -47,7 +48,7 @@ func reEncryptEntries(path string, keys []string) error {
 		return err
 	}
 	for _, n := range names {
-		curKeys, err := entries[n].GetKeys()
+		curKeys, err := gpg.GetKeys(entries[n].Path)
 		if err != nil {
 			return err
 		}
