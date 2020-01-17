@@ -10,8 +10,10 @@ github.com/inconshreveable/mousetrap
 github.com/mitchellh/go-homedir
 # github.com/pquerna/otp v1.2.0
 github.com/pquerna/otp
-github.com/pquerna/otp/totp
 github.com/pquerna/otp/hotp
+github.com/pquerna/otp/totp
+# github.com/rsteube/cobra-zsh-gen v1.1.0
+github.com/rsteube/cobra-zsh-gen
 # github.com/skip2/go-qrcode v0.0.0-20190110000554-dc11ecdae0a9
 github.com/skip2/go-qrcode
 github.com/skip2/go-qrcode/bitset

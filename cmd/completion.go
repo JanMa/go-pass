@@ -55,4 +55,10 @@ __custom_func() {
     esac
 }
 `
+	zsh_completion_func = `
+_go-pass_complete_entries () {
+	local IFS=$'\n'
+	_values -C 'passwords' $(go-pass ls | tail +2)
+}
+`
 )
