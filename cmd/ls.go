@@ -16,7 +16,7 @@ func listPasswords(cmd *cobra.Command, args []string) {
 		all, _ = PasswordStore.FindEntries(args[0] + ".*")
 	}
 	names := store.SortEntries(all)
-	fmt.Printf(util.BoldBlue+"%s:\n"+util.Reset, path)
+	fmt.Printf(util.BoldBlue+"%s:"+util.Reset+"\n", path)
 	for _, n := range names {
 		fmt.Println(n)
 	}

@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strings"
 
+	zsh "github.com/rsteube/cobra-zsh-gen"
 	"github.com/spf13/cobra"
 	"gitlab.com/JanMa/go-pass/pkg/git"
 	"gitlab.com/JanMa/go-pass/pkg/store"
@@ -188,7 +189,15 @@ $ autoload -U compinit && compinit
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			if Zsh {
-				rootCmd.GenZshCompletion(os.Stdout)
+				rootCmd.BashCompletionFunction = zsh_completion_func
+				zsh.Wrap(showCmd).MarkZshCompPositionalArgumentCustom(1, "_go-pass_complete_entries")
+				zsh.Wrap(cpCmd).MarkZshCompPositionalArgumentCustom(1, "_go-pass_complete_entries")
+				zsh.Wrap(editCmd).MarkZshCompPositionalArgumentCustom(1, "_go-pass_complete_entries")
+				zsh.Wrap(generateCmd).MarkZshCompPositionalArgumentCustom(1, "_go-pass_complete_entries")
+				zsh.Wrap(mvCmd).MarkZshCompPositionalArgumentCustom(1, "_go-pass_complete_entries")
+				zsh.Wrap(rmCmd).MarkZshCompPositionalArgumentCustom(1, "_go-pass_complete_entries")
+				zsh.Wrap(otpCmd).MarkZshCompPositionalArgumentCustom(1, "_go-pass_complete_entries")
+				zsh.Wrap(rootCmd).GenZshCompletion(os.Stdout)
 			} else {
 				rootCmd.GenBashCompletion(os.Stdout)
 			}
