@@ -23,6 +23,12 @@ func Encrypt(path, value string, recipients []string, testRunning bool) error {
 	gpg := exec.Command("gpg",
 		"-e", "-o", path,
 		"--quiet", "--yes", "--compress-algo=none", "--no-encrypt-to")
+
+	// If PASSWORD_STORE_ARMOR is set, enable ASCII encoded output
+	if len(os.Getenv("PASSWORD_STORE_ARMOR")) > 0 {
+		gpg.Args = append(gpg.Args, "--armor")
+	}
+
 	for _, r := range recipients {
 		gpg.Args = append(gpg.Args, "-r", r)
 	}
