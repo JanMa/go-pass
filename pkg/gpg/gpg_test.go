@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	// "reflect"
+	"gitlab.com/JanMa/go-pass/pkg/util"
 	"testing"
 )
 
@@ -116,16 +117,32 @@ FKctaiBV3pc9iVC1Idawq6GSEOD7bsn06NaZs8oPuEO7cON2Wk7EpOU0CmK1m1Ia
 -----END PGP MESSAGE-----`
 )
 
+func fatal(t *testing.T, e error) {
+	if e != nil {
+		t.Fatal(e)
+	}
+}
+
+func setGPGHome(t *testing.T) {
+	tmpHome, e := util.TmpFile()
+	fatal(t, e)
+	e = os.Mkdir(tmpHome, 0700)
+	fatal(t, e)
+	e = os.Setenv("GNUPGHOME", tmpHome)
+	fatal(t, e)
+}
+
+func unSetGpgHome(t *testing.T) {
+	e := os.Setenv("GNUPGHOME", "")
+	fatal(t, e)
+}
+
 func importGpgKey(key string, t *testing.T) {
 	tmpFile, err := ioutil.TempFile("", "go-pass-store")
 	defer os.Remove(tmpFile.Name())
-	if err != nil {
-		t.Fatal("creating temp gpg-id:", err)
-	}
+	fatal(t, err)
 	_, err = tmpFile.Write([]byte(key))
-	if err != nil {
-		t.Fatal("writing data to temp file", err)
-	}
+	fatal(t, err)
 	gpgImport := exec.Command("gpg",
 		"--import", tmpFile.Name())
 	out, err := gpgImport.CombinedOutput()
@@ -135,36 +152,18 @@ func importGpgKey(key string, t *testing.T) {
 	}
 }
 
-func deleteGpgKey(secret bool, t *testing.T) {
-	command := "--delete-keys"
-	if secret {
-		command = "--delete-secret-keys"
-	}
-	gpgDelete := exec.Command("gpg",
-		"--batch", "--yes", command, TestPublicKeyFingerPrintLong)
-	out, err := gpgDelete.CombinedOutput()
-	if err != nil {
-		t.Log(string(out))
-		t.Fatal("deleting test GPG key:", err)
-	}
-}
-
 func TestDecrypt(t *testing.T) {
+	setGPGHome(t)
 	importGpgKey(TestPrivateKey, t)
 	importGpgKey(TestPublicKey, t)
 	defer func() {
-		deleteGpgKey(true, t)
-		deleteGpgKey(false, t)
+		unSetGpgHome(t)
 	}()
 	tmpPath, err := ioutil.TempDir("", "go-pass-store")
-	if err != nil {
-		t.Fatal("creating tmp dir:", err)
-	}
+	fatal(t, err)
 	defer os.RemoveAll(tmpPath)
 	err = ioutil.WriteFile(tmpPath+"/Test.gpg", []byte(TestEncryptedMessage), 0644)
-	if err != nil {
-		t.Fatal("writing to tmp file:", err)
-	}
+	fatal(t, err)
 
 	type args struct {
 		path string
@@ -199,21 +198,17 @@ func TestDecrypt(t *testing.T) {
 }
 
 func TestEncrypt(t *testing.T) {
+	setGPGHome(t)
 	importGpgKey(TestPrivateKey, t)
 	importGpgKey(TestPublicKey, t)
 	defer func() {
-		deleteGpgKey(true, t)
-		deleteGpgKey(false, t)
+		unSetGpgHome(t)
 	}()
 	tmpPath, err := ioutil.TempDir("", "go-pass-store")
-	if err != nil {
-		t.Fatal("creating tmp dir:", err)
-	}
+	fatal(t, err)
 	defer os.RemoveAll(tmpPath)
 	err = ioutil.WriteFile(tmpPath+"/Test.gpg", []byte(TestEncryptedMessage), 0644)
-	if err != nil {
-		t.Fatal("writing to tmp file:", err)
-	}
+	fatal(t, err)
 	type args struct {
 		path        string
 		value       string
@@ -246,21 +241,17 @@ func TestEncrypt(t *testing.T) {
 }
 
 func TestGetKeys(t *testing.T) {
+	setGPGHome(t)
 	importGpgKey(TestPrivateKey, t)
 	importGpgKey(TestPublicKey, t)
 	defer func() {
-		deleteGpgKey(true, t)
-		deleteGpgKey(false, t)
+		unSetGpgHome(t)
 	}()
 	tmpPath, err := ioutil.TempDir("", "go-pass-store")
-	if err != nil {
-		t.Fatal("creating tmp dir:", err)
-	}
+	fatal(t, err)
 	defer os.RemoveAll(tmpPath)
 	err = ioutil.WriteFile(tmpPath+"/Test.gpg", []byte(TestEncryptedMessage), 0644)
-	if err != nil {
-		t.Fatal("writing to tmp file:", err)
-	}
+	fatal(t, err)
 
 	type args struct {
 		path string
